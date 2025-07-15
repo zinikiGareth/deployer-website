@@ -1,2 +1,4 @@
 deployment/*.envs
 IMAGE/
+current/
+default.log

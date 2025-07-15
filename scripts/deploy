@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DEPLOYER=`dirname $0`
+DEPLOYER=`dirname $DEPLOYER`/current
+$DEPLOYER/deployer \
+	-m $DEPLOYER/coremod.so \
+	-m $DEPLOYER/deployer_module_aws.so \
+	-m $DEPLOYER/deployer_module_dreamhost.so \
+	-d deployment \
+	"$@"

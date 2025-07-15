@@ -13,14 +13,10 @@ The core of the solution is to have a bucket which has all of the files in it th
 
 		files.copy src_dir deployer_bucket
 
-		// find dreamhost.DomainName "ziniki.org" => domain
-
 		ensure aws.CertificateManager.Certificate "deployer.ziniki.org" => cert
 			@teardown delete
 			ValidationMethod <- "DNS"
 			ValidationProvider <- "dreamhost"
-
-// https://api.dreamhost.com/?key=1A2B3C4D5E6F7G8H&cmd=dns-add_record&record=example.com&type=TXT&value=test123
 
 		cloudfront.distribution.fromS3 "for-deployer" => cloudfront
 			@teardown delete
@@ -39,10 +35,15 @@ The core of the solution is to have a bucket which has all of the files in it th
 
 			TargetOriginId <- "s3-bucket-target"
 
-Then we need to bind the CNAME(s) and/or aliases that we want to use to the cloudfront domain name
-
 		ensure dreamhost.CNAME "deployer.ziniki.org"
 			@teardown delete
 			PointsTo <- (cloudfront->domainName)
-			// Zone <- domain->zoneId
 
+	target upload_deployer_content
+		find aws.S3.Bucket "deployer.ziniki.org" => deployer_bucket
+
+		env "DEPLOYER_WEBSITE_DIR" => root
+
+		files.dir root "IMAGE" => src_dir
+
+		files.copy src_dir deployer_bucket

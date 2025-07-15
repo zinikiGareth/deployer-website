@@ -1,0 +1,15 @@
+#!/bin/bash
+
+SCRIPTS=`dirname $0`
+if [ "$SCRIPTS" != "scripts" ] ; then
+  echo "mkimage must be run from deployer-website dir"
+  exit 1
+fi
+
+mkdir -p IMAGE
+mkdir -p IMAGE/downloads/current
+cp current/* IMAGE/downloads/current
+# TODO: also copy to some version of yyyy-mm
+
+scripts/spliceInto content/index.html
+# cp content/* IMAGE
