@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 SCRIPTS=`dirname $0`
 if [ "$SCRIPTS" != "scripts" ] ; then
@@ -6,10 +6,12 @@ if [ "$SCRIPTS" != "scripts" ] ; then
   exit 1
 fi
 
-mkdir -p IMAGE
-mkdir -p IMAGE/downloads/current
-cp current/* IMAGE/downloads/current
+rm -rf IMAGE
+mkdir IMAGE
+# TODO: just commented out for efficiency reasons ...
+# mkdir -p IMAGE/downloads/current
+# cp current/* IMAGE/downloads/current
 # TODO: also copy to some version of yyyy-mm
 
-scripts/spliceInto content/index.html
+scripts/spliceInto content/index.html > IMAGE/index.html
 # cp content/* IMAGE

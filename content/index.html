@@ -8,8 +8,8 @@
             <div class="sidebar-top">Philosophy</div>
             <div class="sidebar-top">Samples</div>
             <div class="sidebar-top">User Guide</div>
-            <div class="sidebar-second">Command line syntax</div>
-            <div class="sidebar-second">Language features - vars, exprs, nesting, properties</div>
+            <div class="sidebar-second">Command line syntax</div> <!-- including --teardown and --destroy -->
+            <div class="sidebar-second">Language features</div> <!-- including vars, exprs, nesting, properties-->
             <div class="sidebar-second">Environment</div>
             <div class="sidebar-second">Modules</div>
 
@@ -41,7 +41,7 @@
             More importantly, it makes the features it does support easy to use.
         </p>
         <p>
-            Ziniki Deployer has six major attributes that make it different:
+            Ziniki Deployer has six major attributes that make it different to other deployment tools out there:
         </p>
         <ul>
             <li>It has a focus on <b>clarity</b>: scripts should clearly communicate what they do, and not get lost in the minutiae of how they do it;
@@ -66,8 +66,8 @@
             </li>
             <li>It is <b>modular</b>: how modular?  So modular that with no modules installed, Ziniki Deployer is not, in fact, a task-based deployment tool,
                 but simply a parser.  Everything from the idea of <code>target</code>s to its understanding of AWS primitives comes from one or more modules.
-                Although this means that natively it has no understanding of your environment, it means it is just as capable of supporting Azure as it is
-                of supporting AWS.  It also means that if you don't like what we have provided, you can easily add your own.
+                Although this means that natively it has no understanding of your environment, it also means that it is just as capable of supporting Azure
+                as it is of supporting AWS.  It also means that if you don't like what we have provided, you can easily add your own.
             </li>
             <li>It expects you to use <b>composition</b>: there are idempotent primitives for "all" the cloud infrastructure elements.  It's even possible
                 that support for these could be generated.  But the important point is that _you_ don't think that way.  A cloudfront distribution requires
@@ -84,20 +84,14 @@
             The first thing to note about deployer scripts is that they are designed to be "semi-literate" in the tradition of Miranda, Haskell and
             FLAS.  We expect you to write more lines of description <it>about</it> your script than you do actual commands.
         </p>
+%readfile
+deployment/deployer.dply
+%segment
+The core
+
+And then we run to the end
+
+%segment
+%end
     </body>
 </html>
-
-
-
-Go through script... Can I have mkimage slice and dice the actual script by splitting it into pieces based on key lines, and yes, I think I want to split based on the comments so that they come first. And just have this document have 
-%readfile
-Fname
-%segment
-<pattern on next line>? 
-
-Command
-Teardown 
-Modules in use
-
-
-

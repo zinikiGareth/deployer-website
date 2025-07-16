@@ -1,0 +1,37 @@
+#!/bin/bash
+
+awk '
+BEGIN { mode = "COPY" }
+mode == "SETFILE" {
+  readfrom = $0
+  mode = "COPY"
+  next
+}
+mode == "INSERT" {
+  readUntil = $0
+  while (1) {
+    if (pushBack) {
+      inputLine = pushBack
+      pushBack = ""
+      status = 1
+    } else {
+      status = getline inputLine < readfrom
+    }
+	if (substr(inputLine, 1, length(readUntil)) == readUntil) {
+	  pushBack = inputLine
+	  break
+	}
+    print inputLine
+    if (status != 1) {
+      close(readfrom)
+      break
+	}
+  }
+  mode = "COPY"
+  next
+}
+$0 == "%readfile" { mode = "SETFILE" ; next }
+$0 == "%segment" { mode = "INSERT" ; next }
+mode == "COPY" { print ; next }
+{ print "INVALID MODE", mode}
+' "$@"
