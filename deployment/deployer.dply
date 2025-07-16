@@ -41,9 +41,12 @@ The core of the solution is to have a bucket which has all of the files in it th
 
 	target upload_deployer_content
 		find aws.S3.Bucket "deployer.ziniki.org" => deployer_bucket
+		find aws.CloudFront.Distribution "for-deployer" => cloudfront
 
 		env "DEPLOYER_WEBSITE_DIR" => root
 
 		files.dir root "IMAGE" => src_dir
 
 		files.copy src_dir deployer_bucket
+
+		cloudfront.invalidate cloudfront->distributionId
