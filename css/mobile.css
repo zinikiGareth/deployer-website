@@ -1,12 +1,24 @@
+@media (resolution > 128dpi) {
+	html {
+		font-size: 36px;
+	}
+}
+
 body {
 	-webkit-text-size-adjust: none;
 	text-size-adjust: none;
+	padding: 1.1em;
 }
+
 .title {
 	position: relative;
 	text-align: center;
-	font-size: xx-large;
+	font-size: 2rem;
 	font-weight: bold;
+}
+
+div.sidebar-menu {
+	display: none;
 }
 
 .menu-icon {
@@ -15,18 +27,13 @@ body {
 	top: 10px;
 }
 
-div.sidebar-menu {
-	display: none;
-}
-
 .menu-icon.material-symbols-outlined {
   	font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 40;
-	font-size: xx-large;
+	font-size: 2rem;
 	font-weight: bold;
 }
 
 .para {
-	font-size: 1rem;
 	margin-block-start: 1em;
 	margin-block-end: 1em;
 }
@@ -47,9 +54,10 @@ span.code {
 	overflow-x: auto;
 }
 
+/*
 .codeline {
-	font-size: 1rem;
 }
+*/
 
 .codelineno {
 	display: inline-block;
