@@ -1,8 +1,12 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>Ziniki Deployer</title>
+        <link rel="stylesheet" href="css/mobile.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=menu" />
     </head>
     <body>
+        <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Ziniki Deployer</div>
         <div class='sidebar-menu'>
             <div class="sidebar-top">Home</div>
             <div class="sidebar-top">Philosophy</div>
@@ -22,18 +26,17 @@
             <div class="sidebar-second">Coins</div>
             <div class="sidebar-top">Download</div>
         </div>
-        <h1>Ziniki Deployer</h1>
-        <p>
+        <div>
             Most deployment tools (for example, Terraform or CloudFormation) seem to be written as an afterthought,
             with the most important criterion being how easy it is to build them, and to cover as much infrastructure as possible
             with the smallest amount of code possible.
             Little or no thoughts seem to be given to how easy it is to build, debug, validate and understand the configurations they are used to create. 
-        </p>
-        <p>
+        </div>
+        <div>
             Obviously, scripts or programs that are hard to understand are expensive to maintain and are more likely to contain bugs that are hard to spot.
             Identifying subtle security issues is guaranteed to be hard if you have to decipher a custom policy nested inside a JSON document.
             And yet, this is what platform engineers are expected to do when deploying expansive products. 
-        </p>
+        </div>
         <p>
             Ziniki Deployer is different.  It is designed, from the ground up, to be a programming language that helps you to build modular,
             task-based scripts that are easy to understand and reason about.  Currently, it lacks support for a broad range of platforms and functions,
@@ -80,16 +83,19 @@
         <p>
             Let's look at how those work through the lens of a simple example, the script that deploys this website (yes, we eat our own dog food, here).
         </p>
-        <p>
+        <div>
             The first thing to note about deployer scripts is that they are designed to be "semi-literate" in the tradition of Miranda, Haskell and
             FLAS.  We expect you to write more lines of description <it>about</it> your script than you do actual commands.
-        </p>
+        </div>
+        <div class="codeline">hello</div>
 %readfile
 deployment/deployer.dply
 %segment
 The core
 
-And then we run to the end
+        <p>
+            And then we run to the end...
+        </p>
 
 %segment
 %end

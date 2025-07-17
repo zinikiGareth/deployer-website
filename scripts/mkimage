@@ -8,6 +8,8 @@ fi
 
 rm -rf IMAGE
 mkdir IMAGE
+mkdir IMAGE/css
+cp css/* IMAGE/css
 # TODO: just commented out for efficiency reasons ...
 # mkdir -p IMAGE/downloads/current
 # cp current/* IMAGE/downloads/current

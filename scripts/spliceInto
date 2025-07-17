@@ -5,9 +5,11 @@ BEGIN { mode = "COPY" }
 mode == "SETFILE" {
   readfrom = $0
   mode = "COPY"
+  lineNumber = 1
   next
 }
 mode == "INSERT" {
+  printf "<div class='codeblock'>\n"
   readUntil = $0
   while (1) {
     if (pushBack) {
@@ -21,12 +23,13 @@ mode == "INSERT" {
 	  pushBack = inputLine
 	  break
 	}
-    print inputLine
+	printf "<div class='codeline'><span class='codelineno'>%d</span><span class='codelinetext'>%s</span></div>\n", lineNumber++, inputLine
     if (status != 1) {
       close(readfrom)
       break
 	}
   }
+  printf "</div>\n"
   mode = "COPY"
   next
 }

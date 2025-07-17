@@ -32,7 +32,11 @@ The core of the solution is to have a bucket which has all of the files in it th
 					ResponseHeaders <- {}
 						Header <- "Content-Type"
 						Value <- "text/html"
-
+				{}
+					PathPattern <- "*.css"
+					ResponseHeaders <- {}
+						Header <- "Content-Type"
+						Value <- "text/css"
 			TargetOriginId <- "s3-bucket-target"
 
 		ensure dreamhost.CNAME "deployer.ziniki.org"
