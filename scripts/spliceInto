@@ -1,6 +1,39 @@
 #!/bin/bash
 
 awk '
+function blankLine(s) {
+  for (i=1;i<=length(s);i++) {
+    c = substr(s, i, 1)
+    if (c != "\t" && c != " ") {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+function expandTabs(s) {
+  ret = ""
+  cnt = 0
+
+  for (i=1;i<=length(s);i++) {
+    c = substr(s, i, 1)
+    if (c == "\t") {
+      first = 1
+      while (first || cnt % 4 != 0) {
+        ret = ret "&nbsp;"
+        cnt++
+        first = 0
+      }
+    } else if (c == " ") {
+      ret = ret "&nbsp;"
+      cnt++
+    } else {
+      ret = ret c
+      cnt++
+    }
+  }
+  return ret
+}
 BEGIN { mode = "COPY" }
 mode == "SETFILE" {
   readfrom = $0
@@ -19,15 +52,20 @@ mode == "INSERT" {
     } else {
       status = getline inputLine < readfrom
     }
-	if (substr(inputLine, 1, length(readUntil)) == readUntil) {
-	  pushBack = inputLine
-	  break
-	}
-	printf "<div class='codeline'><span class='codelineno'>%d</span><span class='codelinetext'>%s</span></div>\n", lineNumber++, inputLine
+    if (substr(inputLine, 1, length(readUntil)) == readUntil) {
+      pushBack = inputLine
+      break
+    }
+    if (blankLine(inputLine)) {
+      printf "<div class='codeline'><span class='codelineno'></span><span class='codelinetext'></span></div>\n" 
+    } else {
+      printf "<div class='codeline'><span class='codelineno'>%d</span><span class='codelinetext'>%s</span></div>\n", lineNumber, expandTabs(inputLine)
+    }
+    lineNumber++
     if (status != 1) {
       close(readfrom)
       break
-	}
+    }
   }
   printf "</div>\n"
   mode = "COPY"

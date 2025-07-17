@@ -25,10 +25,14 @@ div.sidebar-menu {
 	font-weight: bold;
 }
 
-body p, body ul, body div {
+.para {
 	font-size: 1rem;
 	margin-block-start: 1em;
 	margin-block-end: 1em;
+}
+
+span.code {
+	font-family:'Courier New', Courier, monospace;
 }
 
 .codeblock {
@@ -40,10 +44,18 @@ body p, body ul, body div {
 	padding: 0.5em;
 	border: 2px solid black;
 	border-radius: 0.25em;
-	overflow-x: scroll;
+	overflow-x: auto;
 }
 
 .codeline {
 	font-size: 1rem;
+}
+
+.codelineno {
+	display: inline-block;
+	width: 4em;
+	text-align: right;
+	margin-left: 0.2em;
+	margin-right: 1em;
 }
 
