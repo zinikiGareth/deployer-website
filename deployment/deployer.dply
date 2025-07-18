@@ -1,22 +1,48 @@
-This is the deployer script to deploy a cloudfront website to support deployer.ziniki.org
+This is the deployer dogfood script.
+
+It is responsible for keeping the deployer.ziniki.org website up to date
+
+The deployer_ziniki_org task is responsible for getting all the infrastructure
+in place and up and running.
 
 	target deployer_ziniki_org
 
-The core of the solution is to have a bucket which has all of the files in it that we want
+All of the content is placed in an S3 bucket, "deployer.ziniki.org".
+So the first step is to create that.
 
 		ensure aws.S3.Bucket "deployer.ziniki.org" => deployer_bucket
 			@teardown delete
 
+Find the content on the disk.  This is going to be in different places on
+different machines, so start off by using an environment variable to identify
+where the deployer website directory is.
+
 		env "DEPLOYER_WEBSITE_DIR" => root
+
+Inside that is an "IMAGE" directory.  This script assumes that all of the website
+content has been processed and placed in that directory and can then just be
+mirrored into the bucket to display the website.
 
 		files.dir root "IMAGE" => src_dir
 
+Mirror the contents of the source directory into the bucket.  In theory, this
+should ensure that the contents are exactly the same with the minimal possible effort.
+
 		files.copy src_dir deployer_bucket
+
+In order to use cloudfront with a custom domain, we need to have a certificate.  AWS
+Certificate Manager can issue one of those for us, providing we can "prove" we own the domain.
+Since I do in fact own the domain, I can do this and specify that I will prove this
+using the "DNS" method using the "dreamhost" provider.
 
 		ensure aws.CertificateManager.Certificate "deployer.ziniki.org" => cert
 			@teardown delete
 			ValidationMethod <- "DNS"
 			ValidationProvider <- "dreamhost"
+
+Then we can set up a cloudfront distribution for the website.  This is a complex
+beast and it has a number of moving parts.  In setting this up, we can reference the
+things we have created above (such as the bucket and the certificate).
 
 		cloudfront.distribution.fromS3 "for-deployer" => cloudfront
 			@teardown delete
@@ -26,6 +52,11 @@ The core of the solution is to have a bucket which has all of the files in it th
 			Domain <- []
 				"deployer.ziniki.org"
 			MinTTL <- 300
+			TargetOriginId <- "s3-bucket-target"
+
+The CacheBehaviors are instructions on headers to return based on the filenames.
+For us, we want to return "text/html" for ".html" files and "text/css" for ".css" files.
+
 			CacheBehaviors <- []
 				{}
 					PathPattern <- "*.html"
@@ -37,7 +68,9 @@ The core of the solution is to have a bucket which has all of the files in it th
 					ResponseHeaders <- {}
 						Header <- "Content-Type"
 						Value <- "text/css"
-			TargetOriginId <- "s3-bucket-target"
+
+Finally, we can set up the custom domain name.  Again, because the registrar is
+Dreamhost, this is done there (the equivalent on AWS would be an aws.Route53.CNAME).
 
 		ensure dreamhost.CNAME "deployer.ziniki.org"
 			@teardown delete
