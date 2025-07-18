@@ -1,0 +1,186 @@
+    <div class="contained contained-home">
+        <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Ziniki Deployer</div>
+        <div class="para">
+            Most deployment tools (for example, Terraform or CloudFormation) seem to be written as an afterthought,
+            with the most important criterion being how easy it is to build them, and to cover as much infrastructure as possible
+            with the smallest amount of code possible.
+            Little or no thoughts seem to be given to how easy it is to build, debug, validate and understand the configurations they are used to create. 
+        </div>
+        <div class="para">
+            Obviously, scripts or programs that are hard to understand are expensive to maintain and are more likely to contain bugs that are hard to spot.
+            Identifying subtle security issues is guaranteed to be hard if you have to decipher a custom policy nested inside a JSON document.
+            And yet, this is what platform engineers are expected to do when deploying expansive products. 
+        </div>
+        <div class="para">
+            Ziniki Deployer is different.  It is designed, from the ground up, to be a programming language that helps you to build modular,
+            task-based scripts that are easy to understand and reason about.  Currently, it lacks support for a broad range of platforms and functions,
+            but it is build in a _modular_ fashion that makes it possible to support those in a consistent way as they are needed.
+            More importantly, it makes the features it does support easy to use.
+        </div>
+        <div class="para">
+            Ziniki Deployer has six major attributes that make it different to other deployment tools out there:
+        </div>
+        <ul>
+            <li class="para">It has a focus on <b>clarity</b>: scripts should clearly communicate what they do, and not get lost in the minutiae of how they do it;
+                scripts should be written in a language that is natural for the task at hand, not some general-purpose markup language.
+            </li>
+            <li class="para">It is <b>target based</b>: in their desire to pretend that it is possible to describe everything you want to do declaratively, most
+                deployment tools lose sight of the fact that some operations require messy reality to be involved: servers may need restarting in order
+                to notice a configuration change, for example.  Ziniki Deployer assumes that *you* know what processes you will want in place and allows
+                you to create targets that affect just part of your infrastructure: starting and stopping instances or services in accordance with your
+                needs.
+            </li>
+            <li class="para">It is <b>task oriented</b>: Ziniki Deployer assumes that you have in mind "something that you want to do" and will just want to issue
+                a command to do that.  It does not require you to cobble together a number of operations in some broader script: all the operations should
+                be able to be placed inside a Ziniki Deployer script.
+            </li>
+            <li class="para">It operates <b>idempotently></b>: CloudFormation attempts to pretend that it makes changes to infrastructure "atomically" and, if something
+                goes wrong, starts to roll back the changes that it has made.  While this is a virtuous goal, the fact that AWS architecture is not, in fact,
+                atomic means that you often get stuck in a state where some of the changes have been applied and some rolled back.  Ziniki Deployer does its
+                best to ensure that the world is how it thinks it is before it starts operating (it gets its information about the state of the world directly
+                from the source objects, not an internal "stack"), but if it does fail for any reason, it leaves the job "half done" and will then pick up
+                where it left off after the (necessary) human intervention has resolved the problem.
+            </li>
+            <li class="para">It is <b>modular</b>: how modular?  So modular that with no modules installed, Ziniki Deployer is not, in fact, a task-based deployment tool,
+                but simply a parser.  Everything from the idea of <span class='code'>target</span>s to its understanding of AWS primitives comes from one or more modules.
+                Although this means that natively it has no understanding of your environment, it also means that it is just as capable of supporting Azure
+                as it is of supporting AWS.  It also means that if you don't like what we have provided, you can easily add your own.
+            </li>
+            <li class="para">It expects you to use <b>composition</b>: there are idempotent primitives for "all" the cloud infrastructure elements.  It's even possible
+                that support for these could be generated.  But the important point is that _you_ don't think that way.  A cloudfront distribution requires
+                five objects to be built and linked together just so: the <span class='code'>cloudfront.distribution.fromS3</span> composite does that for you.  Likewise,
+                the <span class='code'>lambda</span> and <span class='code'>api.gateway.v2</span> composites require you to provide all the necessary parameters and build and link
+                all the primitives together.
+            </li>
+        </ul>
+        <h2>A Worked Example</h2>
+%readfile
+deployment/deployer.dply
+        <div class="para">
+            Let's look at how those work through the lens of a simple example, the script that deploys this website (yes, we eat our own dog food, here).
+        </div>
+        <div class="para">
+            The first thing to note about deployer scripts is that they are designed to be "semi-literate" in the tradition of Miranda, Haskell and
+            FLAS.  We expect you to write more lines of description <it>about</it> your script than you do actual commands.
+        </div>
+        <div class="para">
+            Anything that starts in column zero is assumed to be commentary and ignored by the script (although hopefully not
+            by developers).  Blank lines (including lines with some white space) are also ignored.  Use them freely.
+        </div>
+        <div class="para">
+            For all <i>code</i> lines (i.e. all other lines), indentation is significant.  You may use
+            any combination of leading spaces and tabs that appeals to you, but there is <i>no</i> conversion
+            between the two and you must be consistent.  Hopefully, if you are inconsistent, you will
+            receive a very clear error about what you have done wrong, but always bear in mind that there
+            is no 100% reliable way of converting between tabs and spaces, so we simply don't try.
+        </div>
+        <div>
+            Each level of indentation constitutes a sub-element of the parent (less indented) element.  It is up to each
+            element as it is created to define what sub-elements it will allow.
+        </div>
+%segment
+The deployer
+        <div class="para">
+            A <span class="code">target</span> wraps up a sequence of operations or
+            assertions in a sequence.  This is one of a very few "top level" elements, i.e.
+            elements that can appear at the minimum level of indentation in the file.
+            It contains <i>action</i>s, that is, each element appearing one level indented from
+            a target must be a deployment action.
+        </div>
+%segment
+All of the content
+        <div class="para">
+            One of the key attributes of deployer scripts is that they are <i>idempotent</i>.  Much of the
+            infrastructure is built up using the concept of <i>coin</i>s, which are elements
+            of infrastructure which can be created and destroyed by using <span class="code">ensure</span>.
+            This says that if the item already exists, leave it as it is (or update it if the script indicates
+            changes); if the item does not exist, create it.
+        </div>
+        <div class="para">
+            In deployer scripts, commands that generate values can store those values in <it>variable</it>s.
+            They do this by appending <span class="code">=></span>&nbsp;<i>variable</i> to the end of the command
+            line.  Not all commands generate a value; in that case, it is an error to attempt to assign it.
+            Commands that do not have side-effects but do generate a value <i>require</i> that value to be assigned
+            to a variable and failure to do so is an error.
+        </div>
+%segment
+Find the content
+        <div class="para">
+            Environment variables are a good way of handling externalities in scripts.  They can
+            be easily set on the command line; they can be configured inside tools; and the deployer allows
+            them to be specified in files given to the deployment using the <span class="code">-e</span>
+            argument.
+        </div>
+%segment
+Inside that
+        <div class="para">
+            <span class="code">files.dir</span> is a command that is used to navigate to a sub-directory of
+            a directory.
+        </div>
+%segment
+Mirror the contents
+        <div class="para">
+            <span class="code">files.copy</span> copies all the files from the source to the destination.
+            Both source and destination can be anything that knows how to copy (or <i>pour</i>) file contents
+            from one place to another.
+        </div>
+        <div class="para">
+            As with everything in the deployer, the idea is that this command should be idempotent,
+            and that means that the consequence of this operation is that, at the end, the contents of the
+            destination should exactly match the contents of the source; and, the minimum number of
+            transfers should be performed.
+        </div>
+        <div class="note">
+            Sadly, this is not true at the moment.  It is just a copy operation.
+        </div>
+%segment
+In order to
+        <div class="para">
+            The next step in the script is to create a certificate.  In order to know how to create a certificate,
+            the <span class="code">ensure</span> action needs to be given some <i>properties</i>.  The
+            properties have a standard form which is to give the name of the property followed by
+            a left arrow (<span class="code">&lt;-</span>) followed by an expression of the appropriate type.
+        </div>
+        <div class="note">
+            In this example, only a few simple expressions are used.  There is complete documentation
+            on the expression parser elsewhere, or at least there will be.
+        </div>
+        <div class="para">
+            When creating this certificate, we depend not only on the AWS module but the
+            <span class='code'>dreamhost</span> module.  This must be specified on the command line
+            and offers a DNS asserter using the Dreamhost API.  This enables you to automatically
+            issue certificates on AWS even if your registrar is elsewhere.
+        </div>
+        <div class="note">
+            There is currently a bug with Dreamhost specifically where the API does not permit the
+            CNAME records generated by AWS for validation.  I have reported this, but have no current
+            date on when it will be fixed.
+        </div>
+%segment
+Then we
+        <div class="para">
+            <span class="code">cloudfront.distribution</span> is an example of a composite pattern.
+            In order to set up a cloudfront distribution, you need to create a network of interacting
+            infrastructure objects, on top of things like the bucket and certificate that are truly
+            external to the configuration.  It is possible to configure all those elements separately
+            using <span class="code">ensure</span> and <i>coin</i>s (and there is an example of that),
+            but it is hard work and requires you to remember all the objects you need to create, which
+            order to create them in, and link them all together.  The composite used here makes everything
+            much simpler.
+        </div>
+%segment
+The CacheBehaviors
+        <div>
+            Lists and maps can be complicated things to represent neatly in scripts; deployer
+            offers three options to make it as simple as possible.  If you have a singleton
+            list, you can just write the element with no special syntax.  If you have a short and concise
+            list, or a simple map, you can write it all on one line within appropriate brackets or
+            braces and with the elements separated by commas.  Or, if you have a more complex structure,
+            you can assign the "empty" value to the property and then use an indented scope to
+            insert the values.
+        </div>
+%segment
+Finally
+%segment
+%end
+</div>

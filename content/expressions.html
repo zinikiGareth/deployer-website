@@ -1,0 +1,28 @@
+<div class="contained contained-expressions hidden">
+<div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Expressions</div>
+<div class="para">
+	Expression parsing in the deployer is significantly different to in most programming languages, and very different
+	to the traumatic experience of trying to describe calculated values in Terraform or CloudFormation.  The intent
+	has always been to try and make it possible to describe "values" in the most natural way possible.
+</div>
+<div class="para">
+	It is up to individual verbs and contexts to decide where expressions start and finish, and whether only a 
+	"single" token is to be used for an expression, or the rest of the line.  (A "single" token describes something
+	like a number of a string, but also covers any whole expression beginning with a parenthesis, bracket or brace.)
+</div>
+<div class="para">
+	The first thing that happens with expression parsing is that the expression is broken down into sub-expressions
+	based on the presence of parentheses, brackets, braces, commas and colons: in short, explicit grouping, lists and maps
+	are processed before other expression elements.
+</div>
+<div class="para">
+	Within each sub-expression, parsing works from left to right.  Each symbol is identified as either a <i>function</i>,
+	an <i>operator</i>, an <i>identifier</i>, a <i>constant</i> or a <i>sub-expression</i>.  Functions and operators are
+	essentially the same.  Each of them is characterized as prefix, postfix or infix.  Each of them has a precedence
+	level, and the parsing algorithm compares the precedence appropriately.  This is complicated, so it is most easily described
+	by example.
+</div>
+<div class="para">
+	
+</div>
+</div>
