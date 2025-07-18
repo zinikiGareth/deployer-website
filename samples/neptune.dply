@@ -1,0 +1,70 @@
+Provisioning a Neptune cluster requires two separate things to be created: a Cluster and an
+Instance.  It is possible to leave the cluster in place (with your data but minimal cost) but
+delete the engine (which costs more and is only needed when the cluster is active).
+
+The create_neptune_cluster creates both from scratch if neither, but if the cluster already
+exists, it will find the cluster already present in the cloud, create a new primary instance
+and connect the two together.  If both already exist, it does nothing.
+
+    target create_neptune_cluster
+
+Neptune has to run "inside" a VPC.  In order to do this, it requires you to create a special
+"SubnetGroup" (specific to Neptune; this is not a VPC thing).  Theoretically, it is possible
+to create this within this script, but that coin does not yet exist.  It is, however, possible
+to find one that already exists, and store it in the variable _subnet_.
+
+        find aws.Neptune.SubnetGroup "neptunetest" => subnet
+
+Creating the cluster requires a unique name; we can store the resulting cluster (regardless
+of whether we found an existing one or created one) in the variable _cluster_.
+
+        ensure aws.Neptune.Cluster "user-stocks" => cluster
+            @teardown delete
+
+Associate this with the SubnetGroup from the _subnet_ we found above.  Note that the property
+implies we want a _Name_ but it is happy to accept a whole _SubnetGroup_.  This is a common
+pattern in deployer: where it is clear that a specific type of object is acceptable rather
+than its name or arn, it will be accepted and the appropriate value extracted.  If deployer
+cannot "understand" what you have passed it, you will receive an appropriate type error.
+
+            SubnetGroupName <- subnet
+
+To use the cluster with instances of the _db.serverless_ type, it is necessary to specify
+a capacity range.
+
+            MinCapacity <- 1.0
+            MaxCapacity <- 1.0
+
+We need to create a primary Neptune instance in order to actually do any work with the database.
+
+        ensure aws.Neptune.Instance "primary"
+            @teardown delete
+
+We need to associate this with the _cluster_ we just created above.
+
+            Cluster <- cluster
+
+Specify what type of AWS instance should be used to run the database.  Here we specify
+"serverless", indicating we don't want to provision a whole server.  Note that all AWS
+instance types here need to be prefixed with "db.", although that is poorly explained in
+the manual.  Such values are accepted by deployer, but any values without a "db." prefix
+have it automatically added.
+
+We have used an explicit string here, but any string expression would be acceptable.
+
+            InstanceClass <- "serverless"
+
+DB Instances cost money even when idle, so it is reasonable as a developer to close
+them down when not being used.  The cluster and the data will remain in place, and
+a new primary will be started up when the target above is re-run.
+
+    target drop_primary
+        find aws.Neptune.Cluster "user-stocks" => cluster
+
+        ensure aws.Neptune.Instance "primary"
+            @teardown delete
+
+The @destroy adverb in a target identifies a specific piece of infrastructure to be
+destroyed when the whole script is run with the --destroy flag.
+
+            @destroy

@@ -1,0 +1,32 @@
+This is the target to put up (and pull down) all the infrastructure.
+
+    target create_dynamo_table
+
+Dynamo databases are serverless.  In order to use Dynamo, all you need to do is create
+a _Table_.
+
+Dynamo Tables are modelled in deployer as Coins, using the identifier aws.DynamoDB.Table.
+As with all idempotent infrastructure, the table must have a unique name, where unique
+is "within the range of dynamo tables".  If this name already exists, the properties here
+will be used to update it; if it does not exist, they will be created.
+
+        ensure aws.DynamoDB.Table "Stocks"
+
+The @teardown adverb tells ensure what to do when tearing down this Coin.  In this case,
+we specify _delete_, which means throw away all the contents and delete the bucket.  The
+obvious alternative is _preserve_, which does not delete the bucket.  This enables a script
+to ensure that something it depends on does already exist, but assumes that in the usual
+course of events someone else will have created it and depend on it ("owns" it, as Rust
+would say).
+
+            @teardown delete
+
+Specifying DynamoDB tables can be complicated because you need to specify both AttributeDefinitions
+and KeySchema, but end up giving the same fields for both (or throw an error).  Deployer
+avoids this by allowing you to specify any number of fields of any types, but only using
+those which have a nested @Key adverb, the values of which can be _hash_ or _range_.
+
+            Fields <= aws.DynamoFields
+                Symbol string
+                    @Key hash
+                Price number

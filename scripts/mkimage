@@ -18,8 +18,17 @@ cp css/* IMAGE/css
 rm -rf parts
 mkdir parts
 for i in content/* ; do
-  bn=`basename $i`
-  scripts/spliceInto $i > parts/$bn
+  if [ -d $i ] ; then
+    dn=`basename $i`
+    mkdir parts/$dn
+    for j in $i/* ; do
+      bn=`basename $j`
+      scripts/spliceInto $j > parts/$dn/$bn
+    done
+  else
+    bn=`basename $i`
+    scripts/spliceInto $i > parts/$bn
+  fi
 done
 
 cp -r js IMAGE

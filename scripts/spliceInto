@@ -50,9 +50,15 @@ mode == "SETFILE" {
   lineNumber = 1
   next
 }
-mode == "INSERT" {
-  printf "<div class='codeblock'>\n"
-  readUntil = $0
+mode == "SEGMENT" || mode == "INCLUDE" {
+  printf "<div class=%ccodeblock%c>\n", 34, 34
+  if (mode == "INCLUDE") {
+    readfrom = $0
+    readUntil = "%%end"
+    lineNumber = 1
+  } else {
+    readUntil = $0
+  }
   while (1) {
     if (pushBack) {
       inputLine = pushBack
@@ -60,6 +66,10 @@ mode == "INSERT" {
       status = 1
     } else {
       status = getline inputLine < readfrom
+      if (status != 1) {
+        close(readfrom)
+        break
+      }
     }
     if (substr(inputLine, 1, length(readUntil)) == readUntil) {
       pushBack = inputLine
@@ -71,17 +81,14 @@ mode == "INSERT" {
       printf "<div class=%ccodeline%c><span class=%ccodelineno%c>%d</span><span class=%ccodelinetext%s%c>%s</span></div>\n", 34,34,34,34,lineNumber, 34, stylingFor(inputLine), 34, expandTabs(inputLine)
     }
     lineNumber++
-    if (status != 1) {
-      close(readfrom)
-      break
-    }
   }
   printf "</div>\n"
   mode = "COPY"
   next
 }
 $0 == "%readfile" { mode = "SETFILE" ; next }
-$0 == "%segment" { mode = "INSERT" ; next }
+$0 == "%segment" { mode = "SEGMENT" ; next }
+$0 == "%include" { mode = "INCLUDE" ; next }
 mode == "COPY" { print ; next }
 { print "INVALID MODE", mode}
 ' "$@"
