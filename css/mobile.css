@@ -82,3 +82,20 @@ span.code {
 .hidden {
 	display: none;
 }
+
+.sidebar-top {
+	font-weight: bold;
+	font-size: 2rem;
+	margin: 0.3em 0em;
+}
+
+.sidebar-second {
+	font-style: italic;
+	font-size: 1.5rem;
+	margin: 0.2rem 0rem 0.2rem 1.5rem;
+}
+
+.sidebar-third {
+	font-size: 1.2rem;
+	margin: 0.2rem 0rem 0.2rem 2.2rem;
+}
