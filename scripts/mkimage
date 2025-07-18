@@ -15,5 +15,12 @@ cp css/* IMAGE/css
 # cp current/* IMAGE/downloads/current
 # TODO: also copy to some version of yyyy-mm
 
-scripts/spliceInto content/index.html > IMAGE/index.html
-# cp content/* IMAGE
+rm -rf parts
+mkdir parts
+for i in content/* ; do
+  bn=`basename $i`
+  scripts/spliceInto $i > parts/$bn
+done
+
+cp -r js IMAGE
+scripts/assemble layout/page.html > IMAGE/index.html

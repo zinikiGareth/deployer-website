@@ -34,6 +34,15 @@ function expandTabs(s) {
   }
   return ret
 }
+function stylingFor(s) {
+  if (length(s) == 0) {
+    return "";
+  } else if (substr(s, 1, 1) == " " || substr(s, 1, 1) == "\t") {
+    return "";
+  } else {
+    return " code-comment";
+  }
+}
 BEGIN { mode = "COPY" }
 mode == "SETFILE" {
   readfrom = $0
@@ -57,9 +66,9 @@ mode == "INSERT" {
       break
     }
     if (blankLine(inputLine)) {
-      printf "<div class='codeline'><span class='codelineno'></span><span class='codelinetext'></span></div>\n" 
+      printf "<div class=%ccodeline%c><span class=%ccodelineno%c></span><span class=%ccodelinetext%c></span></div>\n", 34,34,34,34,34,34
     } else {
-      printf "<div class='codeline'><span class='codelineno'>%d</span><span class='codelinetext'>%s</span></div>\n", lineNumber, expandTabs(inputLine)
+      printf "<div class=%ccodeline%c><span class=%ccodelineno%c>%d</span><span class=%ccodelinetext%s%c>%s</span></div>\n", 34,34,34,34,lineNumber, 34, stylingFor(inputLine), 34, expandTabs(inputLine)
     }
     lineNumber++
     if (status != 1) {

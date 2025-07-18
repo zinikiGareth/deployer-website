@@ -1,0 +1,19 @@
+#!/bin/bash
+
+awk '
+BEGIN { mode = "COPY"; }
+mode == "INCLUDE_FILE" {
+  mode = "INCLUDE";
+  readfrom = $0;
+  while ((status = getline inputLine < readfrom) == 1) {
+    print inputLine
+  }
+  mode = "COPY";
+  next;
+}
+$0 == "%include" {
+  mode = "INCLUDE_FILE";
+  next;
+}
+{ print; }
+' "$@"
