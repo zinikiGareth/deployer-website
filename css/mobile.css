@@ -18,6 +18,10 @@ body {
 }
 
 div.sidebar-menu {
+	display: block;
+}
+
+div.sidebar-menu.hidden {
 	display: none;
 }
 
@@ -38,12 +42,21 @@ div.sidebar-menu {
 	margin-block-end: 1em;
 }
 
+.note {
+	font-size: 0.8rem;
+	font-style: italic;
+	margin-block-start: 1em;
+	margin-block-end: 1em;
+}
+
 span.code {
 	font-family:'Courier New', Courier, monospace;
+	font-size: 0.9rem;
 }
 
 .codeblock {
 	font-family:'Courier New', Courier, monospace;
+	font-size: 0.8rem;
 	text-wrap: nowrap;
 	background-color: black;
 	color: whitesmoke;
@@ -54,10 +67,9 @@ span.code {
 	overflow-x: auto;
 }
 
-/*
-.codeline {
+.codeline .code-comment {
+	color: green;
 }
-*/
 
 .codelineno {
 	display: inline-block;
@@ -67,3 +79,6 @@ span.code {
 	margin-right: 1em;
 }
 
+.hidden {
+	display: none;
+}
