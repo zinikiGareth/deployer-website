@@ -46,6 +46,7 @@ things we have created above (such as the bucket and the certificate).
 
 		cloudfront.distribution.fromS3 "for-deployer" => cloudfront
 			@teardown delete
+			DefaultRoot <- "deployer_website.html"
 			Bucket <- deployer_bucket
 			Comment <- "a distribution for deployer.ziniki.org"
 			Certificate <- cert->arn

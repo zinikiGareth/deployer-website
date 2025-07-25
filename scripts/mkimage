@@ -8,8 +8,10 @@ fi
 
 rm -rf IMAGE
 mkdir IMAGE
-mkdir IMAGE/css
-cp css/* IMAGE/css
+mkdir -p IMAGE/css/deployer
+cp -r css/deployer/* IMAGE/css/deployer
+mkdir -p IMAGE/js/deployer
+cp -r js/deployer/* IMAGE/js/deployer
 # TODO: just commented out for efficiency reasons ...
 # mkdir -p IMAGE/downloads/current
 # cp current/* IMAGE/downloads/current
@@ -31,5 +33,4 @@ for i in content/* ; do
   fi
 done
 
-cp -r js IMAGE
-scripts/assemble layout/page.html > IMAGE/index.html
+scripts/assemble layout/page.html > IMAGE/deployer_website.html
