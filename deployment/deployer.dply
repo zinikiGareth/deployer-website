@@ -59,15 +59,23 @@ For us, we want to return "text/html" for ".html" files and "text/css" for ".css
 
 			CacheBehaviors <- []
 				{}
+					SubName <- "html"
 					PathPattern <- "*.html"
 					ResponseHeaders <- {}
 						Header <- "Content-Type"
 						Value <- "text/html"
 				{}
+					SubName <- "css"
 					PathPattern <- "*.css"
 					ResponseHeaders <- {}
 						Header <- "Content-Type"
 						Value <- "text/css"
+				{}
+					SubName <- "js"
+					PathPattern <- "*.js"
+					ResponseHeaders <- {}
+						Header <- "Content-Type"
+						Value <- "text/javascript"
 
 Finally, we can set up the custom domain name.  Again, because the registrar is
 Dreamhost, this is done there (the equivalent on AWS would be an aws.Route53.CNAME).
