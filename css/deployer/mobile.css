@@ -1,9 +1,3 @@
-@media (resolution > 128dpi) {
-	html {
-		font-size: 36px;
-	}
-}
-
 body {
 	-webkit-text-size-adjust: none;
 	text-size-adjust: none;

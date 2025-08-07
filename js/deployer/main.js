@@ -48,4 +48,6 @@ function setup() {
 	}
 }
 
-setup();
+window.addEventListener("load", () => {
+	setup();
+});
