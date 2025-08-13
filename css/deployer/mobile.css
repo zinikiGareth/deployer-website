@@ -22,7 +22,7 @@ div.sidebar-menu.hidden {
 .menu-icon {
 	position: absolute;
 	left: 0px;
-	top: 10px;
+	top: 3px;
 }
 
 .menu-icon.material-symbols-outlined {
@@ -46,6 +46,10 @@ div.sidebar-menu.hidden {
 span.code {
 	font-family:'Courier New', Courier, monospace;
 	font-size: 0.9rem;
+}
+
+span.italic {
+	font-style: italic;
 }
 
 .codeblock {
