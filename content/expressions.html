@@ -1,28 +1,65 @@
 <div class="contained contained-expressions hidden">
 <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Expressions</div>
 <div class="para">
-	Expression parsing in the deployer is significantly different to in most programming languages, and very different
+	Expression parsing in the deployer is significantly different from most programming languages, and very different
 	to the traumatic experience of trying to describe calculated values in Terraform or CloudFormation.  The intent
 	has always been to try and make it possible to describe "values" in the most natural way possible.
 </div>
 <div class="para">
-	It is up to individual verbs and contexts to decide where expressions start and finish, and whether only a 
+	It is context dependent where expressions start and finish, and whether only a 
 	"single" token is to be used for an expression, or the rest of the line.  (A "single" token describes something
 	like a number of a string, but also covers any whole expression beginning with a parenthesis, bracket or brace.)
 </div>
 <div class="para">
-	The first thing that happens with expression parsing is that the expression is broken down into sub-expressions
-	based on the presence of parentheses, brackets, braces, commas and colons: in short, explicit grouping, lists and maps
-	are processed before other expression elements.
+	If you are in any doubt as to how an expression would be parsed, you can resolve that by including
+	the sub-expression you want to be evaluated first in parentheses.  At the same time, lists (enclosed in brackets)
+	and maps (enclosed in curly braces) will take precedence over any other operators.
 </div>
 <div class="para">
-	Within each sub-expression, parsing works from left to right.  Each symbol is identified as either a <i>function</i>,
-	an <i>operator</i>, an <i>identifier</i>, a <i>constant</i> or a <i>sub-expression</i>.  Functions and operators are
-	essentially the same.  Each of them is characterized as prefix, postfix or infix.  Each of them has a precedence
-	level, and the parsing algorithm compares the precedence appropriately.  This is complicated, so it is most easily described
-	by example.
+	Within each sub-expression, parsing proceeds from left to right.  Each symbol is identified as either a <i>function</i>,
+	an <i>operator</i>, an <i>variable</i>, a <i>constant</i> or a <i>sub-expression</i>.  Functions and operators are
+	essentially the same: the only difference is in the syntax.  A function is an identifier which has been bound to a function,
+	rather than a variable.  An operator is a set of symbol characters which have been bound to a function.
+	Each function is characterized as prefix (coming before all of its arguments), postfix (coming after all of its arguments) or
+	infix (accepting arguments before or after the operator symbol).  The parser will allow a function to have any number of
+	arguments in the permitted places, although the function definition itself may raise an error if it does not see the number
+	of arguments it desires.
+</div>
+<div class='para'>
+	Consider the function <span class='code'>sum</span> as an example.  The <span class='code'>sum</span> function is a prefix
+	function: that is, the token <span class='code'>sum</span> comes before all the arguments.  If you provide no arguments, it
+	will be happy, and will always evaluate to zero.  If you give one argument, it will return the value of that argument.  If you
+	give multiple arguments it will add them together.
+</div>
+<div class='para'>
+	Likewise, if we consider the <span class='code'>hours</span> function, it is a postfix function.  The parser will accept multiple
+	arguments followed by <span class='code'>hours</span>, but the <span class='code'>hours</span> function will raise an error
+	when consulted, because it only accepts one prefix argument.  Zero, or two or more prefix arguments are not acceptable.
+</div>
+<div class='para'>
+	Every function and operator has a precedence level, and when a single sub-expression contains more than one operator,
+	the parsing algorithm first compares the precedence of the first two operators.  If the first operator has higher precedence,
+	it is presented with the whole sub-expression leading up to the second operator and expected to resolve this to a single
+	expression tree; this is used to replace the initial set of tokens and the algorithm is run again on the remaining tokens.
+	If the second operator has higher precedence, then the initial tokens (up to the first operator) are parked
+	and the algorithm run again; ultimately a single expression tree should result and this is appended to the parked tokens and
+	the final result calculated.
 </div>
 <div class="para">
-	
+	If the two operators have the same precedence, the associativity of the first operator is used.  If this is left associative, it
+	is treated as higher precedence; if it is right associative the second operator is treated as higher precedence.
+</div>
+<div class="para">
+	Note that method invocation is handled as an infix operator.  The operator <span class='code'>-&gt;</span> is an infix operator
+	which takes one prefix argument (the object to operate on), one postfix argument (the name of the method) and optionally many more
+	postfix arguments (which will be passed to the method if present).
+</div>
+<div class="para">
+	Deployer has many more postfix operators (and particularly functions with names) that is typical of most programming languages
+	(which often require all named functions to be prefix functions).  This is to make expressions such as <span class='code'>24 hours</span>
+	be as natural as possible.
+</div>
+<div class="para">
+	Once again, if you are unsure of what the meaning of your expression will be, use parentheses to make it clear.  Others will thank you.
 </div>
 </div>

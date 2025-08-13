@@ -170,7 +170,7 @@ Then we
         </div>
 %segment
 The CacheBehaviors
-        <div>
+        <div class="para">
             Lists and maps can be complicated things to represent neatly in scripts; deployer
             offers three options to make it as simple as possible.  If you have a singleton
             list, you can just write the element with no special syntax.  If you have a short and concise
@@ -181,6 +181,73 @@ The CacheBehaviors
         </div>
 %segment
 Finally
+        <div class="para">
+            We can create a CNAME record with the DNS registrar if it is not there (or update it
+            if it is).  This is required to make sure that we have the custom domain name we want
+            (in this case <span class="code">deployer.ziniki.org</span>) point to the <span class="code">domainName</span>
+            provided by cloudfront.
+        </div>
+%segment
+When
+        <div class="para">
+            Each file can have multiple targets in it; one or more targets can be specified on the
+            deployer command line.  The first target was all about creating the cloudfront distribution.
+            This one is about updating it.
+        </div>
+        <div class="para">
+            In general, the "end point" of both paths should be the same, and it may often be desirable
+            to just have the one path and always use the same command; on the other hand it may be
+            clearer (and quicker) to have a custom path for updating content.
+        </div>
+        <div class="para">
+            It is obviously also important to consider permissions: fewer permissions may be
+            required in order to update the website content than to create all the component parts.
+        </div>
+%segment
+The first step
+        <div class="para">
+            The <span class="code">ensure</span> verb looks for an infrastructure item and makes sure
+            that it is there.  The <span class="code">find</span> verb is responsible for locating an
+            item if it exists, but will not create it if it does not.
+        </div>
+%segment
+We are going
+        <div class="para">
+            The process of finding and copying the files is exactly the same as before
+        </div>
+        <div class="note">
+            As noted above, this currently copies all the files rather than updating the ones that
+            have changed.  This is a bug to be fixed later.
+        </div>
+%segment
+The cloudfront
+        <div class="para">
+            <span class="code">cloudfront.invalidate</span> is different to most of the operations here,
+            in that it is not idempotent and does not attempt to check if it has already been performed.
+            It always operates by invalidating the current cloudfront cache, even if no changes have been
+            made.
+        </div>
+        <div class="note">
+            Two additional features are planned for deployer that would allow you to address this.
+            Firstly, if and when the <span class="code">files.copy</span> operation is an update operation,
+            it will be possible to tell if it has, in fact, updated any files.  Secondly, there will
+            be a <span class="code">case</span> verb that allows conditional execution.  Combining
+            these two will enable scripts to only invalidate the cache if files have changed.
+        </div>
 %segment
 %end
+        <h2>Getting Started</h2>
+        <div class="para">
+            In order to get started, the first step is to <a href='/download'>download</a> the latest deployer
+            binaries.  Then create a directory to store your scripts.  Using the sample above,
+            the other <a href='/samples'>samples</a> and the various
+            tasks from the <a href='/modules'>modules</a>, construct an appropriate script for your
+            use case.
+        </div>
+        <div class="para">
+            Then run the deployer like so:
+        </div>
+        <div class="codeblock">
+            $DEPLOYER_HOME/deployer -m coremod.so -m awsmod.so <span class="italic">target ...</span>
+        </div>
 </div>
