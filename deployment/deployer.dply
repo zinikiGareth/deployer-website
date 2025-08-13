@@ -85,14 +85,29 @@ Dreamhost, this is done there (the equivalent on AWS would be an aws.Route53.CNA
 			@teardown delete
 			PointsTo <- (cloudfront->domainName)
 
+When it's time to update the content, we simply upload the new content and
+invalidate the cloudfront cache.
+
 	target upload_deployer_content
+
+The first step here is to find the existing bucket and cloudfront distribution
+using their unique names.
+
 		find aws.S3.Bucket "deployer.ziniki.org" => deployer_bucket
 		find aws.CloudFront.Distribution "for-deployer" => cloudfront
 
+We are going to copy the contents from the same directory as before; the directory
+is provided in the DEPLOYER_WEBSITE_DIR enviornment variable.
+
 		env "DEPLOYER_WEBSITE_DIR" => root
+
+Find the IMAGE dir and copy files as before.
 
 		files.dir root "IMAGE" => src_dir
 
 		files.copy src_dir deployer_bucket
+
+The cloudfront.invalidate task takes care of invalidating the distribution with a
+given identifier.
 
 		cloudfront.invalidate cloudfront->distributionId
