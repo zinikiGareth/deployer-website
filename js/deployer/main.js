@@ -1,25 +1,5 @@
-function openSection(item, open) {
-	item.addEventListener("click", function(ev) {
-		var all = document.querySelectorAll(".contained");
-		for (var c of all) {
-			c.classList.add("hidden");
-		}
-		open.classList.remove("hidden");
-		var menu = document.querySelector(".sidebar-menu");
-		menu.classList.add("hidden");
-	});
-}
-
-function openMenu(button, open) {
-	button.addEventListener("click", function(ev) {
-		var all = document.querySelectorAll(".contained");
-		for (var c of all) {
-			c.classList.add("hidden");
-		}
-		var menu = document.querySelector(".sidebar-menu");
-		menu.classList.remove("hidden");
-	});
-}
+import { openMenu, openSection } from './menus.js';
+import { initialRoute } from './route.js'
 
 function setup() {
 	var menus = document.querySelectorAll(".menu-icon");
@@ -40,9 +20,7 @@ function setup() {
 		for (var c of mi.classList) {
 			if (c.startsWith("goto-")) {
 				var name = c.replace("goto-", "");
-				console.log(name);
-				var section = document.querySelector(".contained-" + name);
-				openSection(mi, section);
+				openSection(mi, name);
 			}
 		}
 	}
@@ -50,4 +28,8 @@ function setup() {
 
 window.addEventListener("load", () => {
 	setup();
+	initialRoute(window.location.pathname + window.location.hash);
+	window.onhashchange = function(ev) {
+		initialRoute(window.location.pathname + window.location.hash);
+	}
 });
