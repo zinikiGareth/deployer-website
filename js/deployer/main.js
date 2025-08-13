@@ -2,18 +2,10 @@ import { openMenu, openSection } from './menus.js';
 import { initialRoute } from './route.js'
 
 function setup() {
+	window.haveInitialRoute = "/";
 	var menus = document.querySelectorAll(".menu-icon");
 	for (var e of menus) {
 		openMenu(e);
-		/*
-		var cd = e;
-		while (!cd.classList.contains("contained")) {
-			console.log(cd);
-			cd = cd.parentElement;
-		}
-		console.log("contained =", cd);
-		openSection(e, cd);
-		*/
 	}
 	var sbmenu = document.querySelector(".sidebar-menu");
 	for (var mi of sbmenu.children) {

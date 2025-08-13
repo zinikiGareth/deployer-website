@@ -12,6 +12,7 @@ function selectSection(open) {
 
 function openSection(item, open) {
 	item.addEventListener("click", function(ev) {
+		window.history.pushState(null, null, window.haveInitialRoute + open.replaceAll("-", "/"));
 		selectSection(open);
 	});
 }
