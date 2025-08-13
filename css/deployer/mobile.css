@@ -45,7 +45,7 @@ div.sidebar-menu.hidden {
 
 span.code {
 	font-family:'Courier New', Courier, monospace;
-	font-size: 0.9rem;
+	font-size: smaller;
 }
 
 span.italic {
