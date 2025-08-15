@@ -1,4 +1,7 @@
+var currentSection = "home"
+
 function selectSection(open) {
+	currentSection = open;
 	var section = document.querySelector(".contained-" + open);
 	
 	var all = document.querySelectorAll(".contained");
@@ -20,11 +23,16 @@ function openSection(item, open) {
 function openMenu(button, open) {
 	button.addEventListener("click", function(ev) {
 		var all = document.querySelectorAll(".contained");
-		for (var c of all) {
-			c.classList.add("hidden");
-		}
 		var menu = document.querySelector(".sidebar-menu");
-		menu.classList.remove("hidden");
+		if (menu.classList.contains("hidden")) { // open it
+			for (var c of all) {
+				c.classList.add("hidden");
+			}
+			menu.classList.remove("hidden");
+		} else { // it was already open, close it
+			selectSection(currentSection);
+			menu.classList.add("hidden");
+		}
 	});
 }
 

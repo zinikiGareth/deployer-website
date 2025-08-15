@@ -48,6 +48,10 @@ span.code {
 	font-size: smaller;
 }
 
+span.bold {
+	font-weight: bold;
+}
+
 span.italic {
 	font-style: italic;
 }
