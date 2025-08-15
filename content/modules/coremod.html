@@ -1,5 +1,99 @@
 <div class="contained contained-modules-core hidden">
 <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Core Module</div>
 <div class="para">
+	The <span class='code'>core</span> module is what turns the driver into a deployer.  It
+	contains the concept of a target, as well as the code to process arguments and dispatch
+	targets.  It also defines subsidiary extension points to allow definitions within the 
+	provided top level <span class='code'>target</span> definition.
 </div>
+<h2>Extension Points</h2>
+<div class="para">
+	<span class='code'>target</span> - this is an extension point which allows modules to
+	define verbs which may appear within the scope of a target; in other words, actions
+	that targets may perform.
+</div>
+<div class="para">
+	<span class='code'>blank</span> - deployer uses the metaphor of minting coins to describe
+	how infrastructure components are produced.  A <span class='code'>blank</span> is any
+	struct which can be found, minted or handled inline within the deployer, especially with the
+	<span class='code'>find</span> and <span class='code'>ensure</span> verbs.
+</div>
+<div class="para">
+	<span class='code'>policy-statements</span> - the core module defines a verb handler
+	to define policies.  In addition to the obvious statements <span class='code'>allow</span>
+	and <span class='code'>deny</span>, different modules and systems may need additional
+	verbs.  These can be defined here.
+</div>
+<div class="para">
+	<span class='code'>policy-inner</span> - the core module defines a verb handler
+	to define <span class='code'>allow</span> and <span class='code'>deny</span>.
+	Modules may add additional child content to these.
+</div>
+<h2>Top Level Verbs</h2>
+<div class="para">
+	<span class='code'>target &lt;name&gt;</span> - define a target with the given
+	<span class='code'>name</span>.  The inner scope is defined using a verb interpreter
+	with all the verbs found on the <span class='code'>target</span> extension point.
+</div>
+<h2>Target Verbs</h2>
+<div class="para">
+	<span class='code'>env  &lt;expr&gt;</span> - recover a variable from the user environment if
+	it is available; it will be assigned to the (required) variable on the line.  If
+	the environment does not the named variable then an error is reported.
+	tools.Register.Register("target", "show", basic.NewShowCommandHandler(tools))
+</div>
+<div class="para">
+	<span class='code'>show &lt;expr&gt;...</span> - output the values of the
+	expressions to standard output.
+</div>
+<div class="para">
+	<span class='code'>files.dir &lt;expr&gt;...</span> - the arguments are a sequence
+	of path elements; the first must be an absolute path, while the others must be relative.
+	The result is a path which is stored in the (required) variable.
+</div>
+<div class='note'>
+	This is written in the context of file source directories; there probably should be
+	an adverb which allows the path to not exist in order to handle destination directories
+	which will be created.
+</div>
+<div class="para">
+	<span class='code'>files.copy &lt;src&gt; &lt;dest&gt;</span> - this copies (or updates
+	if supported) all the files in <span class='code'>&lt;dest&gt;</span>to match those in
+	<span class='code'>&lt;src&gt;</span>. 
+</div>
+<div class='note'>
+	This is not fully implemented yet.  It should have adverbs to control how it operates:
+	for example, it should be possible to say "update only if changed", "always update",
+	"clean any files that are not included".  Each of these has its uses and the system
+	cannot always decide for itself which is the best strategy.  The safest, and thus the
+	default, is to always copy all the files but not to delete anything.
+</div>
+
+
+	tools.Register.Register("target", "ensure", basic.NewEnsureCommandHandler(tools))
+	tools.Register.Register("target", "find", basic.NewFindCommandHandler(tools))
+	tools.Register.Register("target", "coin", basic.NewMemoryCoinCommandHandler(tools))
+
+	tools.Register.Register("target", "policy", policy.NewPolicyCommandHandler(tools))
+	tools.Register.Register("target", "attachPolicy", policy.NewAttachPolicyCommandHandler(tools))
+
+<h2>Policy Statements</h2>
+<div class="para">
+</div>
+
+	tools.Register.Register("policy-statements", "allow", policy.NewPolicyAllowCommandHandler(tools))
+<h2>Policy Modifiers</h2>
+<div class="para">
+</div>
+
+	tools.Register.Register("policy-inner", "action", policy.NewPolicyActionCommandHandler(tools))
+	tools.Register.Register("policy-inner", "condition", policy.NewPolicyConditionCommandHandler(tools))
+	tools.Register.Register("policy-inner", "principal", policy.NewPolicyPrincipalCommandHandler(tools))
+
+<h2>Function Definitions</h2>
+<div class="para">
+</div>
+
+	tools.Register.Register("function-defn", "hours", time.MakeHoursFunc(tools))
+
 </div>

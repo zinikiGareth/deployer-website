@@ -1,0 +1,54 @@
+<div class="contained contained-interpretation hidden">
+<div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Interpretation</div>
+<div class="para">
+	Once the file has been broken into scopes by indentation, and each line has been tokenized,
+	the tokens in a line can be interpreted.  This process takes place using an interpreter.  The
+	interpreter in force in any given scope depends on the interpretation of the line defining the
+	scope.  The top level interpreter is "hardcoded" by the top level module.
+</div>
+<div class="para">
+	In general, the core module will be in use and that defines the top level interpreter as a 
+	<span class='code'>verb</span> interpreter, which processes the verbs associated with the
+	<span class='code'>top-level</span> extension point.
+</div>
+<div class="note">
+	At the time of writing, the only top level verb is <span class='code'>target</span>, which
+	begins the definition of a deployment target.
+</div>
+<div class="para">
+	Modules can, and should, introduce interpreters for specific situations.  However, the driver
+	supports three built-in forms of interpretation.
+</div>
+<h2>The <span class='code'>Verb</span> Interpreter</h2>
+<div class="para">
+	The <span class='code'>verb</span> interpreter takes the set of input tokens from a line and
+	requires that the first one is an identifier (anything else is an error).  That identifier is
+	used to find a suitable handler from a map associated with an extension point with which the
+	interpreter is configured.  That handler is then expected to process the tokens and return an
+	interpreter for the nested content.
+</div>
+<div class="para">
+	The verb interpreter allows any definitions on a line to be assigned to variables.  This is done
+	by putting the assign operator (<span class='code'>=&gt;</span>) followed
+	by an identifier which is the name of the variable to be assigned at the end of the line.
+</div>
+<h2>The <span class='code'>Properties</span> Interpreter</h2>
+<div class="para">
+	The notion of processing properties is very common in deployer contexts, and as such
+	the <span class='code'>properties</span> interpreter is responsible for handling these.
+</div>
+<div class="para">
+	Each line is either of the form <span class='code italic'>@adverb expr...</span> or
+	<span class='code'><span class='code italic'>name</span> &lt;- <span class='code italic'>expr</span></span>.
+	In the first case, the expressions are parsed and the adverb is attached to the parent context;
+	in the second case, the expression is parsed and the <span class='code'>name</span>,
+	<span class='code'>expr</span> pair is passed to the parent context.
+</div>
+<h2>The <span class='code'>Expression-only</span> Interpreter</h2>
+<div class="para">
+	In a number of cases (specifically when processing nested lists), it is possible for
+	each line to represent a single value.  The <span class='code'>expression-only</span> interpreter
+	handles this situation by treating each line as a single expression and attaching its parsed
+	form to the parent collector.
+</div>
+</div>

@@ -1,0 +1,24 @@
+<div class="contained contained-resolution hidden">
+<div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Resolution</div>
+<div class="para">
+	After all the input files have been parsed, all the identifiers and symbols referenced in the files are
+	resolved in a step known as resolution.
+</div>
+<div class="para">
+	Most of the identifiers will refer to elements that are defined in code, for example
+	<span class="code">+</span> refers to the addition operator, or <span class='code'>hours</span>
+	refers to the built-in function to turn a number into a duration in hours.
+</div>
+<div class="para">
+	It is also possible to define names in files.  Functions defined in modules may do this for
+	any definitions they offer; by default, the only way to do this is to introduce variables using
+	the verb interpreter.
+</div>
+<div class="para">
+	Either way, the definitions are stored in an internal dictionary which understands the
+	concept of block-based scope.  After parsing is
+	complete, all the statements in the file are recursively traversed and all identifiers
+	are examined and associated with the appropriate definition.  If no definition can be found,
+	an error is generated.
+</div>
+</div>

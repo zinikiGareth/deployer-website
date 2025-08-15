@@ -1,0 +1,127 @@
+<div class="contained contained-tokenization hidden">
+<div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Tokenization</div>
+<div class="para">
+	Once the file has been broken into scopes by indentation, each line can be considered separately
+	and tokenized.  The tokenization process is entirely context-free and standardized.  The modules
+	cannot affect tokenization in any way.
+</div>
+<div class="para">
+	There are six types of tokens:
+	<ul>
+		<li>punctuation;</li>
+		<li>symbols;</li>
+		<li>numbers;</li>
+		<li>identifiers;</li>
+		<li>adverbs;</li>
+		<li>and strings.</li>
+	</ul>
+</div>
+<div class="para">
+	<span class='bold'>Punctuation tokens</span> always appear as individual characters and are exactly the following:
+	<ul>
+		<li><span class='code'>(</span> - open parenthesis;</li>
+		<li><span class='code'>)</span> - close parenthesis;</li>
+		<li><span class='code'>[</span> - open (square) bracket;</li>
+		<li><span class='code'>]</span> - close (square) bracket;</li>
+		<li><span class='code'>{</span> - open curly brace;</li>
+		<li><span class='code'>}</span> - close curly brace;</li>
+		<li><span class='code'>:</span> - colon;</li>
+		<li><span class='code'>,</span> - comma.</li>
+	</ul>
+	All of these characters are used in expressions to group and build lists and maps.
+</div>
+<div class="para">
+	<span class='bold'>Symbol tokens</span> consist of groups of one or more of the following symbol characters appearing
+	consecutively without intervening whitespace or other tokens:
+	<ul>
+		<li><span class='code'>+</span> - plus;</li>
+		<li><span class='code'>-</span> - minus;</li>
+		<li><span class='code'>*</span> - star;</li>
+		<li><span class='code'>/</span> - slash;</li>
+		<li><span class='code'>&lt;</span> - less than;</li>
+		<li><span class='code'>=</span> - equals;</li>
+		<li><span class='code'>&gt;</span> - greater than;</li>
+		<li><span class='code'>&amp;</span> - ampersand;</li>
+		<li><span class='code'>|</span> - vertical line;</li>
+		<li><span class='code'>!</span> - exclamation point;</li>
+		<li><span class='code'>$</span> - dollar;</li>
+		<li><span class='code'>%</span> - percent.</li>
+	</ul>
+	Individually or in groups, symbols made from these characters can be assigned function defintions and
+	can then be used in expressions.
+</div>
+<div class="para">
+	<span class='bold'>Numeric tokens</span> consist of valid IEEE 754 floating point numbers or valid
+	hexadecimal numbers with the prefix <span class='code'>0x</span>.  Examples include:
+	<ul>
+		<li><span class='code'>0</span></li>
+		<li><span class='code'>26</span></li>
+		<li><span class='code'>-13</span></li>
+		<li><span class='code'>102.73</span></li>
+		<li><span class='code'>1e3</span></li>
+		<li><span class='code'>7.3e-4</span></li>
+		<li><span class='code'>0x0</span></li>
+		<li><span class='code'>0x3f</span></li>
+		<li><span class='code'>0x8000</span></li>
+	</ul>
+	Numeric tokens always resolve to a floating point number.  When integers are required, deployer will
+	ensure that an appropriate integer is used.
+</div>
+<div class="para">
+	<span class='bold'>Identifier tokens</span> consist of a sequence of characters including letters,
+	digits and the characters <span class='code'>.</span> (dot) and <span class='code'>_</span> (underscore).
+	Identifiers cannot start with a valid number, e.g. <span class='code'>24hours</span> will be broken into
+	two tokens <span class='code'>24</span> and <span class='code'>hours</span>.
+	Examples include:
+	<ul>
+		<li><span class='code'>a</span></li>
+		<li><span class='code'>hello</span></li>
+		<li><span class='code'>pi</span></li>
+		<li><span class='code'>aws.lambda</span></li>
+		<li><span class='code'>the_gateway</span></li>
+		<li><span class='code'>ec2.linux</span></li>
+		<li><span class='code'>s3.my_bucket.has_name</span></li>
+	</ul>
+	Identifier tokens are used as names and must be attached to verbs, functions or variables.
+</div>
+<div class="para">
+	<span class='bold'>Adverb tokens</span> consist of an <span class='code'>@</span> (at) symbol followed
+	by one or more letter characters.  Adverbs must either continue to the end of the line, or must be terminated
+	with a white space character.  They should be written in camel case.
+	Examples include:
+	<ul>
+		<li><span class='code'>@teardown</span></li>
+		<li><span class='code'>@destroy</span></li>
+		<li><span class='code'>@mustExist</span></li>
+		<li><span class='code'>@mayCreate</span></li>
+		<li><span class='code'>@cleanUp</span></li>
+	</ul>
+	Adverb tokens are used in adverb clauses (usually with one argument) to modify the meaning or intent of a verb.
+</div>
+<div class="para">
+	<span class='bold'>String tokens</span> consist of an arbitrary number of characters surrounded by single (<span class='code'>'</span>)
+	or double (<span class='code'>"</span>) quotation marks.  In order to contain the quotation mark within the string,
+	it should be included twice in succession.
+	Examples include:
+	<ul>
+		<li><span class='code'>"hello, world"</span></li>
+		<li><span class='code'>'my name is Alex'</span></li>
+		<li><span class='code'>"he said ""hello"" to me."</span></li>
+		<li><span class='code'>'Alex''s pen'</span></li>
+	</ul>
+	To write two strings next to each other, either the alternative quote marks must be used, or a space must be left between them.
+</div>
+<div class="para">
+	The use of <span class='bold'>any other characters</span> will result in a syntax error.
+</div>
+<h2>Using White Space</h2>
+<div class="para">
+	There is some ambiguity in interpretation of sequences of symbols.  Where such ambiguity exists, the tokenizer will favour greedy
+	consumption of characters (i.e. the first token will take them).  White space can always be used to separate symbols.  For example:
+	<ul>
+		<li><span class='code'>7 e3</span> not <span class='code'>7e3</span></li>
+		<li><span class='code'>'Alex' 'says hello'</span> not <span class='code'>'Alex''says hello'</span></li>
+		<li><span class='code'>f x</span> not <span class='code'>fx</span></li>
+	</ul>
+</div>
+</div>

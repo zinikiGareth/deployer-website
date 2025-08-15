@@ -14,8 +14,9 @@
 </div>
 <div class="para">
 	In each of the sections that follows, the module will describe the extensions it provides, grouped
-	by the extension point names.  Here are the core extension points.
+	by the extension point names.
 </div>
+<h2>Extension Points</h2>
 <div class="para">
 	<span class='code'>main-args</span> - this extension point identifies the main entry point of the
 	program, which will be responsible for processing arguments.  Only one definition of this extension
@@ -35,8 +36,54 @@
 	<span class='code'>target</span>.
 </div>
 <div class="para">
+	<span class='code'>prop-interpreter</span> - this extension point allows modules to attach additional
+	handlers into the property interpreter flow.
+</div>
+<div class="para">
 	<span class='code'>function-defn</span> - this extension point allows modules to provide function definitions.
 	The base driver code already includes basic definitions, listed below.
+</div>
+<h2>Interpreters</h2>
+<div class="para">
+	Deployer uses a very strict indentation rule for interpreting files.  Lines with text in the first column
+	are treated as commentary and are ignored for all practical purposes.  Otherwise, every line must have a 
+	whitespace indentation which is consistent with each of the previous lines with equal or less nesting.  Users
+	may choose any combination of tabs and spaces, but must make the same choice for each active level of nesting.
+	Scopes can then be identified numerically by how many ancestors (active lines with less nesting) they have.
+</div>
+<div class="para">
+	After handling the indentation, the driver parser breaks each line into a list of tokens, and handles any
+	variable assignment that may be present.  The remaining tokens then
+	need to be handled in a way appropriate to the scope (level of indentation and indentation context).
+</div>
+<div class="para">
+	Lines at the top level are always interpreted using the <span class='code'>verb</span> interpreter and the
+	acceptable verbs are those attached to the <span class='code'>top-level</span> extension point; subsequently,
+	each chosen handler is required to return an appropriate interpreter for its nested content.
+</div>
+<div class="para">
+	<span class='code'>verb</span> - this interpreter looks at the first token it receives and requires that it
+	be an <span class='code'>identifier</span>.  It has a dictionary of acceptable verbs and selects the handler that
+	matches.  If no handler matches, it reports an error and returns the <span class='code'>ignore</span> interpreter.
+</div>
+<div class="para">
+	<span class='code'>properties</span> - this interpreter looks for patterns of the form <span class='code'>a &lt;- b</span>
+	and calls the parent scope with a property definition.  It also handles the nested case <span class='code'>a &lt;= handler</span>
+	where <span class='code'>handler</span> is the name of an interpreter defined in the scope which reads the nested
+	scope in order to produce a property value.
+</div>
+<div class="para">
+	The property interpreter also handles <span class='code'>adverbs</span>.  Any adverb token will be passed, along
+	with its argument, to an enclosing scope handler.
+</div>
+<div class="para">
+	<span class='code'>ignore</span> - this interpreter simply ignores all content and returns itself.  This is
+	mainly useful to avoid cascading errors: when a handler encounters an error, it can report it directly and then
+	return this interpreter to avoid having additional (usually spurious) errors be reported to the user.
+</div>
+<div class="para">
+	<span class='code'>disallow</span> - this interpreter simply raises an error that content cannot appear here
+	and then ignores all nested content.
 </div>
 <h2>Builtin Function Definitions</h2>
 <div class="para">

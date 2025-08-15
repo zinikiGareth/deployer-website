@@ -1,0 +1,117 @@
+<div class="contained contained-blocking hidden">
+<div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Blocking</div>
+<div class="para">
+	The first step in analyzing a deployer file is to divide it into lines and blocks.
+</div>
+<div class="para">
+	Every statement must be given on a single line.  There are no continuation lines of any sort.
+	However, each statement can have an arbitrary number of inner "child" lines that change the meaning
+	of the "parent" statement.
+</div>
+<div class="para">
+	The parent-child relationship is entirely determined by white space indentation.  No other syntax
+	(such as curly braces) is or can be used to indicate indentation.  Indentation is strictly within
+	a file and it is not possible to continue definitions inside another file.
+</div>
+<div class="para">
+	All lines that consist entirely of white space characters cannot have meaning.
+	These lines are ignored by the parser.
+</div>
+<div class="para">
+	All lines that do not have any leading white space characters are considered to be commentary lines.
+	These lines are ignored by the parser.
+</div>
+<div class="para">
+	The first non-blank line with leading white space is considered to be the "first" line of the file.
+	All subsequent lines must either have at least the same exact white space characters.
+</div>
+<div class="para">
+	The only significant leading white space characters are the standard space (ASCII 32) and tab (ASCII 9)
+	characters.  No other white space characters (such as invisible white space or non-breaking space) are allowed
+	and using them will result in errors.
+</div>
+<div class="para">
+	Any mixture of spaces and tabs may be used, but in any given scope, exactly the same mixture of spaces
+	and tabs must be used at the beginning of the line.  A tab is a tab and a space is a space.  There is
+	no conversion between the two.
+</div>
+<div class="para">
+	Lines subsequent to the first must have either:
+	<ul>
+		<li>Exactly the same white space prefix as one of the prior lines still in scope;</li>
+		<li>The same white space prefix as the previous non-blank, non-commentary line together with further
+			white space characters.
+		</li>
+	</ul>
+</div>
+<div class="para">
+	The current scope consists of the most recent line at each level of lesser indent than the current line.
+	All other lines are considered out of scope.
+</div>
+<div class="para">
+	Because white space characters are by definition impossible to see and hard to talk about, they are
+	translated internally into "S" for space and "T" for tab.  Any errors about invalid indentation will
+	say things like "SSSS" is not valid in scope with "T": most likely you have mixed a four-space tab
+	with a line beginning with four spaces.  On the screen they look the same, but they are not.  (On their
+	own, either would be valid; it is the mixture which is not.  The deployer takes the first one as being
+	definitive; it does not attempt to understand what you might have meant.)
+</div>
+<h2>An Example</h2>
+<div class="para">
+	Consider the following sample input (not a valid deployer file, but for illustrative purposes):
+</div>
+<div class='codeblock'>
+<div class='codeline'>&nbsp;&nbsp;&nbsp;&nbsp;this is the first line, with four spaces at the front</div>	
+<div class='codeline'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspthe second line begins with six spaces</div>	
+<div class='codeline'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the third line begins with six spaces followed by a tab</div>	
+<div class='codeline'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspthe fourth line begins with six spaces</div>	
+<div class='codeline'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the fifth line begins with eight spaces</div>	
+<div class='codeline'>&nbsp;&nbsp;&nbsp;&nbsp;the sixth line jumps back to four spaces</div>	
+</div>
+<div class="para">
+	From the point of view of the blocker, the text of the line can be ignored, and the white space
+	represented as follows:
+</div>
+<div class='codeblock'>
+<div class='codeline'>SSSS</div>	
+<div class='codeline'>SSSSSS</div>	
+<div class='codeline'>SSSSSST</div>	
+<div class='codeline'>SSSSSS</div>	
+<div class='codeline'>SSSSSSSS</div>	
+<div class='codeline'>SSSS</div>	
+</div>
+<div class="para">
+	Each of these six lines is valid because:
+	<ol>
+		<li>the first line can have any combination of spaces and tabs</li>
+		<li>this has <span class='code'>SSSS</span> as a prefix, so is a child of (1)</li>
+		<li>this has <span class='code'>SSSSSS</span> as a prefix, so is a child of (2)</li>
+		<li>this has indentation of exactly <span class='code'>SSSSSS</span>, so is also a child of (1) and a sibling of (2)</li>
+		<li>this has <span class='code'>SSSSSS</span> as a prefix, so is a child of (4)</li>
+		<li>this has indentation of exactly <span class='code'>SSSS</span>, so is a second top level element and a sibling of (1)</li>
+	</ol>
+</div>
+<div class="para">
+	On the other hand, the following would not be valid:
+	<ul>
+		<li>The second line could not begin <span class='code'>T</span>, because the first line has set the context that all
+		lines in the file must begin <span class='code'>SSSS</span>.</li>
+		<li>The third line could not begin <span class='code'>SSSSS</span>, because it must either be an extension of the full
+			text of the previous line (<span class='code'>SSSSSS</span>), or it must be exactly identical to one of the previous
+			lines in scope (<span class='code'>SSSS</span> or <span class='code'>SSSSSS</span>).</li>
+		lines in the file must begin <span class='code'>SSSS</span>.</li>
+	</ul>
+</div>
+<h2>Tokenization and Interpretation</h2>
+<div class="para">
+	The indentation is used to group individual lines into blocks of lines.  Each nested block of lines
+	constitutes a scope.  Each line is then passed to the tokenizer to be translated into tokens.  The
+	meaning of the line is then determined by the interpreter in force in that scope.
+</div>
+<div class="para">
+	As this process takes place, each tokenized and interpreted line is "attached to" its outer scope
+	(the top level scope for lines at the top level of indentation).  The result of this is to build
+	a parse tree (technically an orchard), where each top level definition represents a potential root
+	of a tree.
+</div>
+</div>
