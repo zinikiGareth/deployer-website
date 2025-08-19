@@ -12,18 +12,21 @@
 	define verbs which may appear within the scope of a target; in other words, actions
 	that targets may perform.
 </div>
+<hr/>
 <div class="para">
 	<span class='code'>blank</span> - deployer uses the metaphor of minting coins to describe
 	how infrastructure components are produced.  A <span class='code'>blank</span> is any
 	struct which can be found, minted or handled inline within the deployer, especially with the
 	<span class='code'>find</span> and <span class='code'>ensure</span> verbs.
 </div>
+<hr/>
 <div class="para">
 	<span class='code'>policy-statements</span> - the core module defines a verb handler
 	to define policies.  In addition to the obvious statements <span class='code'>allow</span>
 	and <span class='code'>deny</span>, different modules and systems may need additional
 	verbs.  These can be defined here.
 </div>
+<hr/>
 <div class="para">
 	<span class='code'>policy-inner</span> - the core module defines a verb handler
 	to define <span class='code'>allow</span> and <span class='code'>deny</span>.
@@ -42,10 +45,12 @@
 	the environment does not the named variable then an error is reported.
 	tools.Register.Register("target", "show", basic.NewShowCommandHandler(tools))
 </div>
+<hr/>
 <div class="para">
 	<span class='code'>show &lt;expr&gt;...</span> - output the values of the
 	expressions to standard output.
 </div>
+<hr/>
 <div class="para">
 	<span class='code'>files.dir &lt;expr&gt;...</span> - the arguments are a sequence
 	of path elements; the first must be an absolute path, while the others must be relative.
@@ -56,6 +61,7 @@
 	an adverb which allows the path to not exist in order to handle destination directories
 	which will be created.
 </div>
+<hr/>
 <div class="para">
 	<span class='code'>files.copy &lt;src&gt; &lt;dest&gt;</span> - this copies (or updates
 	if supported) all the files in <span class='code'>&lt;dest&gt;</span>to match those in
@@ -68,32 +74,112 @@
 	cannot always decide for itself which is the best strategy.  The safest, and thus the
 	default, is to always copy all the files but not to delete anything.
 </div>
-
-
-	tools.Register.Register("target", "ensure", basic.NewEnsureCommandHandler(tools))
-	tools.Register.Register("target", "find", basic.NewFindCommandHandler(tools))
-	tools.Register.Register("target", "coin", basic.NewMemoryCoinCommandHandler(tools))
-
-	tools.Register.Register("target", "policy", policy.NewPolicyCommandHandler(tools))
-	tools.Register.Register("target", "attachPolicy", policy.NewAttachPolicyCommandHandler(tools))
-
+<hr/>
+<div class="para">
+	<span class='code'>find &lt;coin&gt; &lt;name&gt;</span> - locate an existing piece
+	of infrastructure.  The <span class='code'>coin</span> identifies what sort of infrastructure
+	you are looking for, and the <span class='code'>name</span> is a unique identifer that can
+	be used to identify a specific instance of that coin.  See the section on Naming for more
+	information on names.
+</div>
+<div class="para">
+	There are a number of cases in which <span class='code'>find</span> can be used.  The most
+	important case is to find items of infrastructure (such as domain names) which either cannot
+	or should not generally be created automatically.  Another common case is to find a piece
+	of infrastructure (such as a VPC) which is managed by another deployment script or process.
+	A third case is to find items of infrastructure created locally but which were not captured.
+</div>
+<div class="note">
+	There are some rough edges here that need to be smoothed out in the fulness of time.
+	Firstly, it is to be expected that <span class='code'>find</span> will fail immediately if the component
+	cannot be found; but the third case prevents that.  The third case exists for components that
+	are created in composites; but it really should be possible to "capture" those in variables rather
+	than doing find at all.  Secondly, if we want <span class='code'>find</span> to work in different
+	ways, there should be an adverb to control how it functions.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>ensure &lt;coin&gt; &lt;name&gt;</span> - locate or create a piece
+	of infrastructure.  The <span class='code'>coin</span> identifies what sort of infrastructure
+	and the <span class='code'>name</span> is a unique identifer that can
+	be used to identify a specific instance of that coin.  See the section on Naming for more
+	information on names.
+</div>
+<div class="para">
+	<span class='code'>ensure</span> is the central cornerstone of the deployer.  Most of the work
+	done in most scripts is to ensure that various coins exist.  It is strictly idempotent.  It first
+	tries to identify if the named coin exists; only if it does not, will it be created.
+</div>
+<div class="para">
+	If the coin does already exist, it should be <span class='italic'>updated</span> to match the
+	indicated configuration.  Where this is not possible, an error should be raised.
+</div>
+<div class="note">
+	Actually performing these updates is the responsibility of the individual coins; at the time of
+	writing many of them are not good at it.  Caveat Emptor!  If you suspect that an update is not
+	happening, don't doubt your sanity, doubt the code.  Feel free to fix it or get someone else to
+	do so.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>coin &lt;coin&gt; [&lt;name&gt;]</span> - some coins do not have a separate
+	existence in the cloud space with an identifiable name, but can only exist as part of a
+	bigger entity.  These cannot be "found".  Consequently the <span class='code'>coin</span> command
+	is used to create these "in memory"; the name is likewise only in memory and does not correspond
+	to anything in the cloud.
+</div>
+<div class="note">
+	All memory coins <span class='bold'>MUST</span> be bound to a variable so that they can be used
+	in other entities.  Failure to do so is an error.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>policy</span> - start the definition of an inline policy.
+	The nested content indicates what the rules of the policy should be.
+</div>
+<div class="note">
+	Policies defined at the top level <span class='bold'>MUST</span> be bound to a variable so that
+	they can be attached to other entities.  Failure to do so is an error.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>attachPolicy &lt;to&gt; &lt;policy&gt;</span> - attach a previously defined
+	policy to an infrastructure element.
+</div>
 <h2>Policy Statements</h2>
 <div class="para">
+	<span class='code'>allow &lt;action&gt; &lt;resource&gt;</span> - allow the specified
+	<span class="code">action</span> to be applied to the specified <span class="code">resource</span>.
+	The nested content may include additional constraints using the policy modifiers.
 </div>
-
-	tools.Register.Register("policy-statements", "allow", policy.NewPolicyAllowCommandHandler(tools))
+<hr/>
+<div class="note">
+	At least <span class="code">deny</span> should also be supported.
+</div>
 <h2>Policy Modifiers</h2>
 <div class="para">
+	<span class='code'>action &lt;action&gt; ...</span> - include additional actions to be permitted
+	with the specified resources.
 </div>
-
-	tools.Register.Register("policy-inner", "action", policy.NewPolicyActionCommandHandler(tools))
-	tools.Register.Register("policy-inner", "condition", policy.NewPolicyConditionCommandHandler(tools))
-	tools.Register.Register("policy-inner", "principal", policy.NewPolicyPrincipalCommandHandler(tools))
-
+<hr/>
+<div class="note">
+	There should be an equivalent <span class="code">resource</span> command.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>principal &lt;type&gt; &lt;id&gt;</span> - specify a role as a principal
+	with a given type and identifier.  This is something provided by AWS and may be AWS-specific, in
+	which case it should probably be moved to the AWS module.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>condition &lt;test&gt; &lt;left&gt; &lt;right&gt;</span> - some permissions
+	are conditional - for example, based on the role name.  It adds a condition element to the surrounding
+	policy action.
+</div>
 <h2>Function Definitions</h2>
 <div class="para">
+	<span class='code'>hours</span> - a postfix operator which converts a number into a duration quantity
+	equivalent to that numnber of hours.
 </div>
-
-	tools.Register.Register("function-defn", "hours", time.MakeHoursFunc(tools))
-
 </div>

@@ -1,0 +1,74 @@
+<div class="contained contained-namning hidden">
+<div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Naming</div>
+<div class="note">
+	The two hardest problems in computer science are cache invalidation and naming things - traditional joke.
+</div>
+<div class="para">
+	Names have a special place in Ziniki Deployer and are often treated differently from other values.
+</div>
+<div class="para">
+	Unlike many other systems, Ziniki Deployer does <span class='bold'>not</span> keep any external database
+	of what it has done or what it believes the state of the world to be.  All it has to go on are the
+	deployment files it reads and "reality".  The upside of this is that there is no "drift", nor is there
+	any need for "drift detection".  But it does require that every piece of infrastructure can be uniquely
+	named <span class='italic'>a priori</span>, even before it is created, and that name must always exist
+	in a 1-1 (or arguably 1-0) relationship with the corresponding piece of infrastructure.
+</div>
+<div class="para">
+	Many infrastructure components welcome a unique name, or even demand one.  In this case, this
+	<span class='code'>name</span> field is used.
+</div>
+<div class="para">
+	Some infrastructure components have a unique field, but it may not be what we traditionally think of
+	as a "name".  For example, AWS API Gateway components must have a unique <span class='code'>route</span>.
+	While this is not what is generally thought of as a name, it is guaranteed to be a unique string, so
+	it servers our purposes.
+</div>
+<div class="para">
+	Some infrastructure components have a specific "idempotent" field.  Where this is the case, the
+	deployer's idea of the name will be stored here.
+</div>
+<div class="para">
+	Some infrastructure components allow for tags to be attached to the component.  Where this is the case,
+	Ziniki Deployer will attach a tag.  This may be called <span class='code'>Name</span> if that seems
+	appropriate, or a more specific tag may be attached.
+</div>
+<div class="para">
+	Some infrastructure components do not provide any of the above mechanisms.  In this case, Ziniki Deployer
+	will work hard to find some way in which the component can be uniquely identified - for example, through
+	a <span class='code'>Description</span> field.  This is not ideal, but it is an essential part of the
+	deployer's operation.
+</div>
+<div class="para">
+	Many infrastructure components generate a unique ID during creation.  This is fine and excellent, and
+	deployer will allow you to use this in expressions <span class='italic'>once it is available</span>.  But
+	obviously, it is not possible to write that value in the script creating that component and thus it
+	cannot be used for any infrastructure that you want deployer to create.
+</div>
+<div class="para">
+	Because some or all of these fields may have rules imposed on them by the cloud systems, those rules
+	must also be adopted by Ziniki Deployer.  Where possible, these rules have been documented here, but
+	be aware that complete consistency of naming cannot be achieved in a system this modular and dependent
+	on its downstream systems.
+</div>
+<div class="note">
+	Because names are so important, and are referenced very early in the process to find the existing
+	infrastructure and match it up with the definitions in the input files, it is generally required that
+	the names can be evaluated from values defined entirely in the script; or often that they must be
+	explicit strings.  Over time, it is hoped that this restriction will be eased somewhat, but the
+	fundamental constraint will always exist: you need to know the name of something before it is created
+	because otherwise you cannot match it up.
+</div>
+<h2>Changing Names</h2>
+<div class="para">
+	Changing names is, obviously, a tricky prospect.  It should be possible in a two-step process in
+	which the input file needs to be modified twice: once to introduce a link between the old name and
+	the new name, and then again to move fully over to the new name.  However, this is not yet supported.
+</div>
+<div class="para">
+	Currently, the only process for changing the names of objects is to use another tool (most likely the
+	online UI) to change the actual name of the infrastructure component and at the same time update all
+	references to the name in the deployer files.  Since the deployer has no other knowledge of the name,
+	everything should continue to work fine.
+</div>
+</div>
