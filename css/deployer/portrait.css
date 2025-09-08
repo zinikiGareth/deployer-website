@@ -1,0 +1,12 @@
+body {
+	padding: 1.1em;
+}
+
+div.sidebar-menu {
+	display: block;
+}
+
+div.sidebar-menu.hidden {
+	display: none;
+}
+

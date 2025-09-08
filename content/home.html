@@ -1,5 +1,6 @@
-    <div class="contained contained-home hidden">
-        <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Ziniki Deployer</div>
+<div class="contained contained-home hidden">
+    <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Ziniki Deployer</div>
+    <div class='content-scroll'>
         <div class="para">
             Most deployment tools (for example, Terraform or CloudFormation) seem to be written as an afterthought,
             with the most important criterion being how easy it is to build them, and to cover as much infrastructure as possible
@@ -46,8 +47,9 @@
                 Although this means that natively it has no understanding of your environment, it also means that it is just as capable of supporting Azure
                 as it is of supporting AWS.  It also means that if you don't like what we have provided, you can easily add your own.
             </li>
-            <li class="para">It expects you to use <b>composition</b>: there are idempotent primitives for "all" the cloud infrastructure elements.  It's even possible
-                that support for these could be generated.  But the important point is that _you_ don't think that way.  A cloudfront distribution requires
+            <li class="para">It expects you to use <b>composition</b>: there are idempotent primitives for many cloud infrastructure elements.  You could
+                define all your configurations using these basic building blocks, but as humans, 
+                <span class='italic'>we</span> don't think that way.  A cloudfront distribution requires
                 five objects to be built and linked together just so: the <span class='code'>cloudfront.distribution.fromS3</span> composite does that for you.  Likewise,
                 the <span class='code'>lambda</span> and <span class='code'>api.gateway.v2</span> composites require you to provide all the necessary parameters and build and link
                 all the primitives together.
@@ -250,4 +252,5 @@ The cloudfront
         <div class="codeblock">
             $DEPLOYER_HOME/deployer -m coremod.so -m awsmod.so <span class="italic">target ...</span>
         </div>
+    </div>
 </div>

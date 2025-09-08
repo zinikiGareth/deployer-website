@@ -1,5 +1,510 @@
 <div class="contained contained-modules-aws hidden">
 <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>AWS Module</div>
+<div class='content-scroll'>
 <div class="para">
+	The <span class='code'>AWS</span> module is designed to support the AWS cloud.  It will
+	probably only ever support a small portion of the cloud infrastructure, and other modules
+	will be created to support other portions of the AWS cloud (which is now very big).
+</div>
+<div class="note">
+	For the foreseeable future, this module will only implement those features which are needed
+	to support existing projects.  There is no plan to support even a consistent subset of AWS
+	functionality.
+</div>
+<h2>Extension Points</h2>
+<div class="para">
+	<span class='code'>dns-asserter</span> - this is an extension point which allows modules to
+	specify a means of asserting that they control a DNS name.  It is needed to support the workflow
+	to create a certificate.
+</div>
+<h2>Target Verbs</h2>
+<div class="para">
+	<span class='code'>cloudfront.invalidate &lt;expr&gt;</span> - invalidate an existing cloudfront
+	distribution by <span class='code'>id</span>.  The <span class="code">id</span> will need to be
+	recovered by some means, e.g. looking up a cloudfront distribution by name.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>lambda.addPermissions &lt;name&gt;</span> - add permissions to a lambda.  This
+	is a specific lambda operation and is <span class="italic">not</span> about adding permissions to its
+	role.  It is specifically used to add permissions allowing the API Gateway to invoke the lambda.  The
+	provided name is a name associated with the permission and is not a reference to a pre-existing object.
+	The inner scope of this declaration are policy statements, typically <span class='code'>allow</span>.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>lambda.publishVersion</span> - publish the "current" version of the lambda.  That is,
+	publish a new version of the lambda, referencing the current state of code and configuration.  It takes
+	two nested arguments: <span class='code'>Name</span> (the lambda function name or ARN) and optionally an
+	<span class='code'>Alias</span>, in which case the named alias will be updated with the provided version.
+</div>
+
+	<h2>Composites</h2>
+<div class="para">
+	<span class='code'>cloudfront.distribution.fromS3 &lt;name&gt;</span> - create a cloudfront distribution
+	along with all the necessary components to make it work.
+</div>
+<div class="option-para">
+	<span class='code'>Bucket</span> - the bucket or bucket ARN from which to retrieve
+	the files to distribute.
+</div>
+<div class="option-para">
+	<span class='code'>Certificate</span> - the ARN of a certificate in the ACM certificate manager to be associated
+	with the distribution.
+</div>
+<div class="option-para">
+	<span class='code'>Comment</span> - a string value to attach to the <span class='code'>Comment</span> field
+	on the distribution object.
+</div>
+<div class="option-para">
+	<span class='code'>Domain</span> - a list of string values which represent the custom domains
+	to be associated with the distribution.
+</div>
+<div class="option-para">
+	<span class='code'>MinTTL</span> - a time value which determines the minimum lifetime of content
+	served by the distribution.
+</div>
+<div class="option-para">
+	<span class='code'>CacheBehaviors</span> - a list of objects to describe the response values for
+	various types of content by path.
+</div>
+<div class="option-para">
+	<span class='code'>TargetOriginId</span> - a unique string that is used to tie together various parts
+	of the cache policy and behavior.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>lambda.function &lt;name&gt;</span> - create a lambda function, together with
+	a version and alias.
+</div>
+<div class="option-para">
+	<span class='code'>Runtime</span> - a string describing the desired runtime.  Any of the indicated runtimes
+	in the AWS manual are accepted.  <span class="code">"go"</span> is also accepted as a synonym for <span class="code">"provided.al2023"</span>.
+</div>
+<div class="option-para">
+	<span class='code'>Code</span> - a location indicating where the code is going to come from.  Typically,
+	this will use the <span class="code">aws.S3.Location</span> interpreter to define it using
+	a <span class='code'>Bucket</span> and <span class='code'>Key</span>.
+</div>
+<div class="option-para">
+	<span class='code'>Role</span> - every lambda needs a role to operate as, giving it permissions
+	to execute.  This can be simply the ARN of a pre-existing role, or it can be an inline
+	definition of the role using the <span class='code'>aws.IAM.WithRole</span> interpreter.
+</div>
+<div class="option-para">
+	<span class='code'>PublishVersion</span> - a boolean indicating if the current configuration should be
+	published as a new version.
+</div>
+<div class="option-para">
+	<span class='code'>Alias</span> - a string value indicating that the current version should be
+	published as an alias with this name.
+</div>
+<div class="option-para">
+	<span class='code'>VpcConfig</span> - a configuration, usually defined with the <span class='code'>aws.VPC.Config</span>
+	interpreter, that specifies the VPC configuration to place the lambda in.  If not present, the
+	lambda is not placed in a VPC.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>api.gatewayV2 &lt;name&gt;</span> - create an APIGatewayV2 with all the necessary components.
+</div>
+<div class="option-para">
+	<span class='code'>Protocol</span> - select the type of gateway you wish to create: "http" or "websocket".
+</div>
+<div class="option-para">
+	<span class='code'>IpAddressType</span> - select the IP Address Protocols to be supported by the
+	gateway: "ipv4"", "ipv6" or "dualstack".
+</div>
+<div class="option-para">
+	<span class='code'>integration &lt;name&gt;</span> - select a suitable integration type for the backend
+	of the gateway.  The appropriate values are included in the nested block.
+</div>
+<div class="option-para">
+	<span class='code'>route &lt;path&gt; &lt;integration&gt;</span> - define a route based on its
+	declared path and the integration name to associate with it.
+</div>
+<div class="option-para">
+	<span class='code'>stage &lt;name&gt;</span> - request that a stage be created for the gateway with the given name.
+	This will automatically cause the gateway to be deployed to that stage.
+</div>
+
+	<h2>Blanks</h2>
+<div class="para">
+	<span class='code'>aws.ApiGatewayV2.Api &lt;name&gt;</span> - an APIGatewayV2 blank.
+</div>
+<div class="option-para">
+	<span class='code'>Protocol</span> - select the type of gateway you wish to create: "http" or "websocket".
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.ApiGatewayV2.Deployment &lt;name&gt;</span> - an APIGatewayV2 deployment blank.
+</div>
+<div class="option-para">
+	<span class='code'>Api</span> - the id of the associated Api object.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.ApiGatewayV2.Integration &lt;name&gt;</span> - an APIGatewayV2 integration blank.  This
+	provides one of potentially many ways of connecting API requests to backend services (e.g. lambdas).
+</div>
+<div class="option-para">
+	<span class='code'>Api</span> - the id of the associated Api object.
+</div>
+<div class="option-para">
+	<span class='code'>Region</span> - the region in which the associated lambda is to be found.
+</div>
+<div class="option-para">
+	<span class='code'>PayloadFormatVersion</span> - the payload format version (1.0 or 2.0); only applicable to HTTP protocole.
+</div>
+<div class="option-para">
+	<span class='code'>Type</span> - the integration type.  Use <div class="code">AWS_PROXY</div> for lambda.
+</div>
+<div class="option-para">
+	<span class='code'>Uri</span> - the Uri of the corresponding resource, e.g. the ARN of a lambda.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.ApiGatewayV2.Route &lt;path&gt;</span> - an APIGatewayV2 route blank.  The 
+	<div class="code">route</div> here is a means of describing the action to be performed in order to invoke
+	the route.  For http routes, this is something like <div class="code">"GET /index"</div>; and for websocket
+	routes it is a content expression such as <div class="code">$default</div>.
+</div>
+<div class="option-para">
+	<span class='code'>Api</span> - the id of the associated Api object.
+</div>
+<div class="option-para">
+	<span class='code'>Target</span> - an appropriate URL for the recipient lambda, which can be obtained by
+	invoking the <div class="code">integrationId</div> method on a lambda object.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.ApiGatewayV2.Stage &lt;name&gt;</span> - an APIGatewayV2 stage blank.  This represents
+	a stage such as <div class="code">development</div> or <div class="code">production</div>.
+</div>
+<div class="option-para">
+	<span class='code'>Api</span> - the id of the associated Api object.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>awa.ApiGatewayV2.VPCLink &lt;name&gt;</span> - an APIGatewayV2 vpc link.  This represents
+	a link into a VPC.
+</div>
+<div class="option-para">
+	<span class='code'>Subnets</span> - the subnets of the VPC to join.
+</div>
+<div class="option-para">
+	<span class='code'>SecurityGroups</span> - the security groups of the VPC to apply.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.CertificateManager.Certificate &lt;subject-name&gt;</span> - a certificate.  The subject-name
+	is the default subject name for the certificate.
+</div>
+<div class="option-para">
+	<span class='code'>Domain</span> - a domain object that can be used for validation.
+</div>
+<div class="option-para">
+	<span class='code'>SubjectAlternativeNames</span> - a list of alternative names to include in the certificate.
+</div>
+<div class="option-para">
+	<span class='code'>ValidationMethod</span> - how the ownership of the domain is going to be proved.  "DNS" is the only
+	currently supported method.
+</div>
+<div class="option-para">
+	<span class='code'>ValidationProvider</span> - the name of a mechanism for autoamatically validating the
+	DNS name.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.CloudFront.CacheBehavior &lt;name&gt;</span> - a cache behavior descriptor that describes how
+	to cache certain types of content.
+</div>
+<div class="option-para">
+	<span class='code'>CachePolicy</span> - the id of the cache policy to associate this behavior with.
+</div>
+<div class="option-para">
+	<span class='code'>PathPattern</span> - a specific path pattern to match against the target files.
+</div>
+<div class="option-para">
+	<span class='code'>ResponseHeadersPolicy</span> - the id of a response headers policy.
+</div>
+<div class="option-para">
+	<span class='code'>TargetOriginId</span> - the id of the target origin (i.e. bucket).
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.CloudFront.CachePolicy &lt;name&gt;</span> - a cache policy descriptor to bundle together
+	cache behaviors.
+</div>
+<div class="option-para">
+	<span class='code'>MinTTL</span> - the minimum time to live for documents retrieved from the bucket.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.CloudFront.Distribution &lt;name&gt;</span> - a cloudfront distribution.
+</div>
+<div class="option-para">
+	<span class='code'>CacheBehaviors</span> - the (list of) cache behavior objects to associate with the distribution.
+</div>
+<div class="option-para">
+	<span class='code'>CachePolicy</span> - the cache policy to associate with the distribution.
+</div>
+<div class="option-para">
+	<span class='code'>Certificate</span> - the id of a certificate to identify the website.
+</div>
+<div class="option-para">
+	<span class='code'>Comment</span> - a comment about the distribution.
+</div>
+<div class="option-para">
+	<span class='code'>DefaultRoot</span> - the default path to extract for the distribution when faced with an index request.
+</div>
+<div class="option-para">
+	<span class='code'>Domain</span> - the (list of) domains to accept requests for.
+</div>
+<div class="option-para">
+	<span class='code'>OriginAccessControl</span> - an object to describe the access control mechanism for the target.
+</div>
+<div class="option-para">
+	<span class='code'>OriginDNS</span> - a DNS name describing the origin.
+</div>
+<div class="option-para">
+	<span class='code'>TargetOriginId</span> - an id to associate with the target origin.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.CloudFront.OriginAccessControl &lt;name&gt;</span> - an origin access control link between
+	a distribution and a bucket.
+</div>
+<div class="option-para">
+	<span class='code'>OriginAccessControlOriginType</span> - the type of the OAC.
+</div>
+<div class="option-para">
+	<span class='code'>SigningBehavior</span> - how to sign the requests to the bucket.
+</div>
+<div class="option-para">
+	<span class='code'>SigningProtocol</span> - the protocol for signing the requests.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.CloudFront.ResponseHeadersPolicy &lt;name&gt;</span> - a header to associate with a cache behavior.
+</div>
+<div class="option-para">
+	<span class='code'>Header</span> - the header to set in the response.
+</div>
+<div class="option-para">
+	<span class='code'>Value</span> - the value to set the header to.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.DynamoDB.Table &lt;name&gt;</span> - a dynamodb table called name.
+</div>
+<div class="option-para">
+	<span class='code'>Fields</span> - a list of field expressions, where each field is a pair of name and type,
+	There can also be an <span class='code'>@Key</span> adverb attached to individual fields to identify them as key fields.
+	The <span class='code'>@Key</span> adverb takes a parameter which can either be <span class='code'>hash</span> or <span class='code'>range</span>.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.IAM.Policy &lt;name&gt;</span> - a manmaged policy with the given name.
+</div>
+<div class="option-para">
+	<span class='code'>Policy</span> - a policy document (q.v.).
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.IAM.Role &lt;name&gt;</span> - a role for assumption.
+</div>
+<div class="option-para">
+	<span class='code'>Assume</span> - a list of policy actions to allow the role to be assumed.
+</div>
+<div class="option-para">
+	<span class='code'>Inline</span> - a list of policy actions which can be performed by the role once assumed.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Lambda.Alias &lt;name&gt;</span> - a lambda alias.
+	This can only be used as a finder - to create a new alias, use <span class='code'>lambda.publishVersion</span>.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Lambda.Function &lt;name&gt;</span> - a lambda function.
+</div>
+<div class="option-para">
+	<span class='code'>Code</span> - a reference to the location of the code for the lambda, probably using the <span class='code'>aws.S3.Location</span> interpreter.
+</div>
+<div class="option-para">
+	<span class='code'>Handler</span> - a definition for the handler (if required by language runtime).
+</div>
+<div class="option-para">
+	<span class='code'>Role</span> - a role to attach to the lambda, possibly defined inline with <span class='code'>aws.IAM.WithRole</span>.
+</div>
+<div class="option-para">
+	<span class='code'>Runtime</span> - a string definition of the runtime, which may also be provided as "go" to define the Go runtime.
+</div>
+<div class="option-para">
+	<span class='code'>VpcConfig</span> - a VPC configuration, which can be defined inline with <span class='code'>aws.VPC.Config</span>.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Neptune.Cluster &lt;name&gt;</span> - a neptune cluster.
+</div>
+<div class="option-para">
+	<span class='code'>MaxCapacity</span> - the maximum capacity to associate with a serverless cluster.
+</div>
+<div class="option-para">
+	<span class='code'>MinCapacity</span> - the minimum capacity to associate with a serverless cluster.
+</div>
+<div class="option-para">
+	<span class='code'>SubnetGroupName</span> - the name of a subnet group to identify the subnets on which the cluster will show up.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Neptune.Instance &lt;name&gt;</span> - a neptune instance.
+</div>
+<div class="option-para">
+	<span class='code'>Cluster</span> - the cluster to associate the instance with.
+</div>
+<div class="option-para">
+	<span class='code'>InstanceClass</span> - the class of the server to run (or "serverless").
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Neptune.SubnetGroup &lt;name&gt;</span> - a neptune subnet group.
+	<span class='note'>As yet, this does not support creating new subnet groups.  This is just a missing feature.</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Route53.ALIAS &lt;name&gt;</span> - a route53 ALIAS record.
+</div>
+<div class="option-para">
+	<span class='code'>AliasZone</span> - the zone which is responsible for storing the node pointed to.
+</div>
+<div class="option-para">
+	<span class='code'>PointsTo</span> - the name pointed to.
+</div>
+<div class="option-para">
+	<span class='code'>UpdateZone</span> - the zone to update (i.e. insert the ALIAS record into).
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Route53.CNAME &lt;name&gt;</span> - a route53 CNAME record.
+</div>
+<div class="option-para">
+	<span class='code'>PointsTo</span> - the name pointed to.
+</div>
+<div class="option-para">
+	<span class='code'>Zone</span> - the zone to update (i.e. insert the CNAME record into).
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.Route53.DomainName &lt;name&gt;</span> - a route53 domain name record.
+	Because of the complexity of creating domain names (and the fact that it costs money), creating
+	domain names is not supported by deployer.  You can, however, find them by (domain) name.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.S3.Bucket &lt;name&gt;</span> - an S3 bucket called <span class='code'>name</span>.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.VPC.VPC &lt;name&gt;</span> - a VPC record.
+	<span class='note'>As yet, this does not support creating new VPC objects.  This is just a missing feature.</span>
+</div>
+<h2>Interpreters</h2>
+These interpreters allow individual properties to be set with compound values expressed succinctly.
+<div class="para">
+	<span class='code'>aws.DynamoFields</span> - parse a scope of field descriptions as a list.
+</div>
+<div class="option-para">
+	<span class='code'>field type</span> - a pair of field name and field type.
+</div>
+<div class="option-para">
+	<span class='code'>@Key type</span> - a nested adverb identifying key fields.  The type can either be
+	<span class='code'>hash</span> or <span class='code'>range</span>.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.IAM.WithRole</span> - parse a scope, definiting an inline role.
+</div>
+<div class="option-para">
+	<span class='code'>assume</span> - introduce a nested scope which defines who can assume the role.
+</div>
+<div class="option-para">
+	<span class='code'>policy</span> - introduce a nested scope which defines permissions granted to the role.
+</div>
+<div class="option-para">
+	<span class='code'>policy &lt;name&gt;</span> - add a managed policy to the role (does not have a nested scope).
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.S3.Location</span> - identify a specify object in an S3 bucket.
+</div>
+<div class="option-para">
+	<span class='code'>Bucket</span> - the name of the bucket.
+</div>
+<div class="option-para">
+	<span class='code'>Key</span> - the object key in the bucket.
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.VPC.Config</span> - identify a specify object in an S3 bucket.
+</div>
+<div class="option-para">
+	<span class='code'>DualStack</span> - specify if the VPC should use both IPv4 and IPv6.
+</div>
+<div class="option-para">
+	<span class='code'>Subnets</span> - the list of subnets to associate with the VPC config.
+</div>
+<div class="option-para">
+	<span class='code'>SecurityGroups</span> - the list of security groups to include in the VPC config.
+</div>
+<h2>Constants</h2>
+<div class="para">
+	<span class='code'>aws.action.APIGateway.GET</span> - <span class="code">"apigateway:GET"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.action.ec2.CreateNetworkInterface</span> - <span class="code">"ec2:CreateNetworkInterface"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.action.ec2.DescribeNetworkInterfaces</span> - <span class="code">"ec2:DescribeNetworkInterfaces"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.action.ec2.DeleteNetworkInterface</span> - <span class="code">"ec2:DeleteNetworkInterface"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.action.S3.GetObject</span> - <span class="code">"s3:GetObject"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.action.S3.PutObject</span> - <span class="code">"s3:PutObject"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.principal.AWS</span> - <span class="code">"AWS"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.principal.CloudFront</span> - <span class="code">"cloudfront.amazonaws.com"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.principal.Service</span> - <span class="code">"Service"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.resource.APIGatewayV2</span> - <span class="code">"arn:aws:apigateway:us-east-1::/apis"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.cond.StringEquals</span> - <span class="code">"StringEquals"</span>
+</div>
+<hr/>
+<div class="para">
+	<span class='code'>aws.SourceArn</span> - <span class="code">"aws:SourceArn"</span>
+</div>
 </div>
 </div>

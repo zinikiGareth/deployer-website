@@ -1,0 +1,36 @@
+body {
+	margin: 0px;
+}
+
+.container {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+}
+
+div.contained {
+	max-width: 1200px;
+	min-width: 1200px;
+}
+
+div.sidebar-menu {
+	display: block;
+	min-width: 300px;
+	height: calc(100vh - 2rem);
+	padding: 1rem;
+}
+
+div.sidebar-menu .title, span.menu-icon {
+	display: none;
+}
+
+div.content-scroll {
+	overflow-y: auto;
+	height: calc(100vh - 6rem);
+	padding: 1rem;
+}
+
+div.contained div.title {
+	height: 3rem;
+	padding: 0.5rem;
+}

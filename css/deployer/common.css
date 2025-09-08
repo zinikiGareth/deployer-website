@@ -1,7 +1,6 @@
 body {
 	-webkit-text-size-adjust: none;
 	text-size-adjust: none;
-	padding: 1.1em;
 }
 
 .title {
@@ -11,18 +10,11 @@ body {
 	font-weight: bold;
 }
 
-div.sidebar-menu {
-	display: block;
-}
-
-div.sidebar-menu.hidden {
-	display: none;
-}
-
 .menu-icon {
 	position: absolute;
 	left: 0px;
 	top: 3px;
+	cursor: pointer;
 }
 
 .menu-icon.material-symbols-outlined {
@@ -36,6 +28,12 @@ div.sidebar-menu.hidden {
 	margin-block-end: 1em;
 }
 
+.option-para {
+	margin-left: 1em;
+	margin-block-start: 0.5em;
+	margin-block-end: 0.5em;
+}
+
 .note {
 	font-size: 0.8rem;
 	font-style: italic;
@@ -45,7 +43,7 @@ div.sidebar-menu.hidden {
 
 span.code {
 	font-family:'Courier New', Courier, monospace;
-	font-size: smaller;
+	font-size: 90%;
 }
 
 span.bold {
@@ -83,6 +81,19 @@ span.italic {
 
 .hidden {
 	display: none;
+}
+
+div.sidebar-menu {
+	overflow-y: scroll;
+	scrollbar-width: none;
+}
+
+div.sidebar-menu::-webkit-scrollbar {
+  display: none;
+}
+
+div.sidebar-menu div {
+	cursor: pointer;
 }
 
 .sidebar-top {
