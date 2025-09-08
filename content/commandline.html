@@ -1,0 +1,35 @@
+<div class="contained contained-commandline hidden">
+    <div class="title"><span class="menu-icon material-symbols-outlined">menu</span>Command Line Syntax</div>
+    <div class='content-scroll'>
+        <div class="para">
+			The following options are supported by the deployer:
+        </div>
+        <div class="para">
+			<span class="code">-d &lt;dir&gt;</span> - specify a directory to read target files.
+        </div>
+        <div class="para">
+			<span class="code">-e &lt;envs&gt;</span> - read a file from one of the specified directories containing environment variable definitions.
+        </div>
+        <div class="para">
+			<span class="code">-m &lt;module&gt; or --module &lt;module&gt;</span> - include the specified module file
+			as a module in the deployer.
+        </div>
+        <div class="para">
+			<span class="code">--teardown</span> - reverse the process and tear down everything that it is not protected
+			by a suitable <span class='code'>@teardown</span> adverb in the chosen targets.
+        </div>
+        <div class="para">
+			<span class="code">--destroy</span> - allow objects tagged with @destroy to be destroyed.
+        </div>
+        <div class="para">
+			<span class="code">target</span> - the name of a target in a target file.
+        </div>
+        <div class="para">
+			Note that <span class="italic">all</span> of the files in all of the specified directories will
+			always be read and parsed whenever the deployer is run.  The intention here is to ensure that there is
+			a limit to the amount of "drift" that can take place.  But only those targets which are explicity named
+			on the command line will actually be executed.  One consequence of this is that unexpected errors may
+			occur from files that you were not expecting to be read.
+        </div>
+    </div>
+</div>
