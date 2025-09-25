@@ -22,6 +22,7 @@ function configureReleases(document) {
 		var remove = r.querySelectorAll(".release-icon")[1];
 		r.addEventListener("click", openOrCloseRelease(r.nextElementSibling, add, remove));
 	}
+	openOrCloseRelease(r.nextElementSibling, add, remove)();
 }
 
 export { configureReleases }

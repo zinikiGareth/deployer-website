@@ -90,9 +90,9 @@ $0 == "%readfile" { mode = "SETFILE" ; next }
 $0 == "%segment" { mode = "SEGMENT" ; next }
 $0 == "%include" { mode = "INCLUDE" ; next }
 $0 == "%releases" {
-  cmd = "ls -1 content/releases"
+  cmd = "ls -1 content/release-info"
   while (cmd | getline r) {
-    file = "content/releases/" r
+    file = "content/release-info/" r
     while (getline s < file) {
       print s
     }
