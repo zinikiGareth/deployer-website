@@ -112,3 +112,16 @@ div.sidebar-menu div {
 	font-size: 1.2rem;
 	margin: 0.2rem 0rem 0.2rem 2.2rem;
 }
+
+.release-date {
+	cursor:pointer;
+}
+
+.release-icon {
+	display: inline;
+	vertical-align: middle;
+}
+
+.release-icon.hidden {
+	display: none;
+}

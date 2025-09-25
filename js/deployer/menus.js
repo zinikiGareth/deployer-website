@@ -40,4 +40,20 @@ function openMenu(button, open) {
 	});
 }
 
-export { selectSection, openMenu, openSection }
+function configureMenus(document) {
+	var menus = document.querySelectorAll(".menu-icon");
+	for (var e of menus) {
+		openMenu(e);
+	}
+	var sbmenu = document.querySelector(".sidebar-menu");
+	for (var mi of sbmenu.children) {
+		for (var c of mi.classList) {
+			if (c.startsWith("goto-")) {
+				var name = c.replace("goto-", "");
+				openSection(mi, name);
+			}
+		}
+	}
+}
+
+export { selectSection, openMenu, openSection, configureMenus }
