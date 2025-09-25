@@ -12,10 +12,8 @@ mkdir -p IMAGE/css/deployer
 cp -r css/deployer/* IMAGE/css/deployer
 mkdir -p IMAGE/js/deployer
 cp -r js/deployer/* IMAGE/js/deployer
-# TODO: just commented out for efficiency reasons ...
-# mkdir -p IMAGE/downloads/current
-# cp current/* IMAGE/downloads/current
-# TODO: also copy to some version of yyyy-mm
+mkdir -p IMAGE/releases
+cp -r releases/* IMAGE/releases
 
 rm -rf parts
 mkdir parts

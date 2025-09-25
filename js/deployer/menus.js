@@ -9,6 +9,10 @@ function selectSection(open) {
 		c.classList.add("hidden");
 	}
 	section.classList.remove("hidden");
+	var scrollDowns = section.querySelectorAll(".scroll-to-bottom");
+	for (var sd of scrollDowns) {
+		sd.scrollTo(0, sd.scrollHeight);
+	}
 	var menu = document.querySelector(".sidebar-menu");
 	menu.classList.add("hidden");
 }

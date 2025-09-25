@@ -30,6 +30,12 @@ div.content-scroll {
 	padding: 1rem;
 }
 
+div.release-scroll {
+	overflow-y: auto;
+	height: 70vh;
+	padding: 1rem;
+}
+
 div.contained div.title {
 	height: 3rem;
 	padding: 0.5rem;

@@ -1,5 +1,5 @@
 deployment/*.envs
 IMAGE/
-current/
 parts/
+releases/
 default.log
