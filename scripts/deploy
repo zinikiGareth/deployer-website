@@ -1,10 +1,16 @@
 #!/bin/bash
 
 DEPLOYER=`dirname $0`
-DEPLOYER=`dirname $DEPLOYER`/current
+DEPLOYER=`dirname $DEPLOYER`
+cd $DEPLOYER
+REL=`ls -1r ../deployer-website/releases/ | head -1`
+rm -rf $HOME/tmp/deployer
+mkdir -p $HOME/tmp/deployer
+(unzip -d $HOME/tmp/deployer releases/$REL/deployer-`uname -s | tr '[:upper:]' '[:lower:]'`-`uname -m`.zip)
+DEPLOYER=$HOME/tmp/deployer
 $DEPLOYER/deployer \
 	-m $DEPLOYER/coremod.so \
-	-m $DEPLOYER/deployer_module_aws.so \
-	-m $DEPLOYER/deployer_module_dreamhost.so \
+	-m $DEPLOYER/deployer-module-aws.so \
+	-m $DEPLOYER/deployer-module-dreamhost.so \
 	-d deployment \
 	"$@"
